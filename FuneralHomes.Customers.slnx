@@ -1,0 +1,23 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/1.Api/">
+    <Project Path="src/1.Api/FH.Api.Customer.csproj" />
+  </Folder>
+  <Folder Name="/src/2.Modules/" />
+  <Folder Name="/src/2.Modules/FH.Modules.Audit/">
+    <Project Path="src/2.Modules/FH.Modules.Audit/FH.Modules.Audit.csproj" />
+  </Folder>
+  <Folder Name="/src/2.Modules/FH.Modules.Beneficiaries/">
+    <Project Path="src/2.Modules/FH.Modules.Beneficiaries/FH.Modules.Beneficiaries.csproj" />
+  </Folder>
+  <Folder Name="/src/2.Modules/FH.Modules.Customer/">
+    <Project Path="src/2.Modules/FH.Modules.Customer/FH.Modules.Customer.csproj" />
+  </Folder>
+  <Folder Name="/src/2.Modules/FH.Modules.CustomerPlans/">
+    <Project Path="src/2.Modules/FH.Modules.CustomerPlans/FH.Modules.CustomerPlans.csproj" />
+  </Folder>
+  <Folder Name="/src/3.Externals/">
+    <Project Path="src/3.Externals/FH.Shared/FH.Shared.csproj" />
+    <Project Path="src/3.Externals/FH.Modules.Messaging/FH.Modules.Messaging.csproj" />
+  </Folder>
+</Solution>

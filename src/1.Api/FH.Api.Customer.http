@@ -1,0 +1,6 @@
+@FH.Api.Customer_HostAddress = http://localhost:5112
+
+GET {{FH.Api.Customer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
