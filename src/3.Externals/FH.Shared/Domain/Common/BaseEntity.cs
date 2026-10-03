@@ -1,10 +1,18 @@
+using MediatR;
+
 namespace FH.Shared.Domain.Common;
 
-public interface IDomainEvent
+public interface IDomainEvent : INotification
 {
     Guid EventId { get; }
     DateTime OccurredOn { get; }
     string EventType { get; }
+}
+
+public interface IHasDomainEvents
+{
+    IReadOnlyCollection<IDomainEvent> DomainEvents { get; }
+    void ClearDomainEvents();
 }
 
 public abstract class BaseEntity<TId>
@@ -56,7 +64,7 @@ public abstract class BaseEntity : BaseEntity<Guid>
     }
 }
 
-public abstract class AggregateRoot<TId> : BaseEntity<TId>
+public abstract class AggregateRoot<TId> : BaseEntity<TId>, IHasDomainEvents
 {
     private readonly List<IDomainEvent> _domainEvents = [];
 
