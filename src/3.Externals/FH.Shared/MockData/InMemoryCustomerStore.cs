@@ -3,11 +3,11 @@ using FH.Shared.Domain.Entities;
 using FH.Shared.Domain.Enums;
 using FH.Shared.Domain.Services;
 
-namespace FH.Api.Customer.MockData;
+namespace FH.Shared.MockData;
 
 public class InMemoryCustomerStore
 {
-    private readonly ConcurrentDictionary<Guid, FH.Shared.Domain.Entities.Customer> _customers = new();
+    private readonly ConcurrentDictionary<Guid, Customer> _customers = new();
     private readonly ConcurrentDictionary<Guid, CustomerSubscription> _subscriptions = new();
     private readonly ConcurrentDictionary<Guid, Member> _members = new();
     private readonly ConcurrentDictionary<Guid, Beneficiary> _beneficiaries = new();
@@ -21,7 +21,7 @@ public class InMemoryCustomerStore
     private void SeedMockData()
     {
         // 1. Cliente Persona Natural
-        var customer1 = new FH.Shared.Domain.Entities.Customer(
+        var customer1 = new Customer(
             Guid.Parse("11111111-1111-1111-1111-111111111111"),
             CustomerType.Individual,
             "Carlos Alberto Rodríguez Pérez",
@@ -32,7 +32,7 @@ public class InMemoryCustomerStore
             "Calle 100 # 15-20, Bogotá");
 
         // 2. Cliente Corporativo
-        var customer2 = new FH.Shared.Domain.Entities.Customer(
+        var customer2 = new Customer(
             Guid.Parse("22222222-2222-2222-2222-222222222222"),
             CustomerType.Corporate,
             "Tech Solutions Corp S.A.S.",
@@ -123,13 +123,13 @@ public class InMemoryCustomerStore
     }
 
     // --- Métodos de Clientes ---
-    public IEnumerable<FH.Shared.Domain.Entities.Customer> GetCustomers() =>
+    public IEnumerable<Customer> GetCustomers() =>
         _customers.Values.OrderByDescending(c => c.CreatedAt);
 
-    public FH.Shared.Domain.Entities.Customer? GetCustomerById(Guid id) =>
+    public Customer? GetCustomerById(Guid id) =>
         _customers.TryGetValue(id, out var customer) ? customer : null;
 
-    public FH.Shared.Domain.Entities.Customer? GetCustomerByIdentification(string type, string number) =>
+    public Customer? GetCustomerByIdentification(string type, string number) =>
         _customers.Values.FirstOrDefault(c =>
             c.IdentificationType.Equals(type, StringComparison.OrdinalIgnoreCase) &&
             c.IdentificationNumber.Equals(number, StringComparison.OrdinalIgnoreCase));
@@ -137,7 +137,7 @@ public class InMemoryCustomerStore
     public bool ExistsCustomerIdentification(string type, string number) =>
         GetCustomerByIdentification(type, number) is not null;
 
-    public void AddCustomer(FH.Shared.Domain.Entities.Customer customer) =>
+    public void AddCustomer(Customer customer) =>
         _customers.TryAdd(customer.Id, customer);
 
     // --- Métodos de Suscripciones ---

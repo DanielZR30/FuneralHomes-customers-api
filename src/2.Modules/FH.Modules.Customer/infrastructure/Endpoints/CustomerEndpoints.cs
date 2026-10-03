@@ -1,10 +1,13 @@
-using FH.Api.Customer.DTOs;
-using FH.Api.Customer.MockData;
+using FH.Modules.Customer.Application.DTOs;
 using FH.Shared.Domain.Entities;
 using FH.Shared.Domain.Enums;
+using FH.Shared.MockData;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 
-namespace FH.Api.Customer.Endpoints;
+namespace FH.Modules.Customer.Infrastructure.Endpoints;
 
 public static class CustomerEndpoints
 {
@@ -50,7 +53,7 @@ public static class CustomerEndpoints
             return Results.Ok(customers);
         })
         .WithName("GetCustomers")
-        .WithSummary("Listar clientes registrados (Mock en Memoria)")
+        .WithSummary("Listar clientes registrados (Módulo Customer)")
         .Produces<IEnumerable<CustomerResponse>>(StatusCodes.Status200OK);
 
         // GET /api/v1/customers/{id} - Obtener cliente por ID

@@ -1,9 +1,12 @@
-using FH.Api.Customer.DTOs;
-using FH.Api.Customer.MockData;
+using FH.Modules.CustomerPlans.Application.DTOs;
 using FH.Shared.Domain.Entities;
 using FH.Shared.Domain.Enums;
+using FH.Shared.MockData;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 
-namespace FH.Api.Customer.Endpoints;
+namespace FH.Modules.CustomerPlans.Infrastructure.Endpoints;
 
 public static class SubscriptionEndpoints
 {

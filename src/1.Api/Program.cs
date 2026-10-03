@@ -1,5 +1,9 @@
-using FH.Api.Customer.Endpoints;
-using FH.Api.Customer.MockData;
+using FH.Modules.Audit.Extensions;
+using FH.Modules.Beneficiaries.Extensions;
+using FH.Modules.Customer.Extensions;
+using FH.Modules.CustomerPlans.Extensions;
+using FH.Modules.Messaging.Extensions;
+using FH.Shared.MockData;
 using FH.Shared.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
@@ -20,6 +24,13 @@ builder.Services.AddDbContext<CustomerDbContext>(options =>
 
 // Almacén Mock en memoria (permite probar la API y Swagger sin requerir PostgreSQL levantado)
 builder.Services.AddSingleton<InMemoryCustomerStore>();
+
+// 1. REGISTRO DE MÓDULOS DE LA APLICACIÓN
+builder.Services.AddCustomerModule(builder.Configuration);
+builder.Services.AddCustomerPlansModule(builder.Configuration);
+builder.Services.AddBeneficiariesModule(builder.Configuration);
+builder.Services.AddAuditModule(builder.Configuration);
+builder.Services.AddMessagingModule(builder.Configuration);
 
 // Configuración de serialización JSON con Enums legibles (ej: "Individual", "Human", "Child")
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
@@ -63,11 +74,11 @@ app.MapGet("/health", () => Results.Ok(new
 .WithTags("Health")
 .WithSummary("Verifica el estado de salud del microservicio");
 
-// Mapeo modular de rutas de la API
-app.MapCustomerEndpoints();
-app.MapSubscriptionEndpoints();
-app.MapBeneficiaryEndpoints();
-app.MapAuditEndpoints();
+// 2. MAPEO MODULAR DE RUTAS DE CADA MÓDULO
+app.MapCustomerModuleEndpoints();
+app.MapCustomerPlansModuleEndpoints();
+app.MapBeneficiariesModuleEndpoints();
+app.MapAuditModuleEndpoints();
 
 app.Run();
 

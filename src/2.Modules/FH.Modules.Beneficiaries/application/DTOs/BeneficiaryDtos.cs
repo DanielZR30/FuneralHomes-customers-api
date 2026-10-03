@@ -1,7 +1,7 @@
 using FH.Shared.Domain.Entities;
 using FH.Shared.Domain.Enums;
 
-namespace FH.Api.Customer.DTOs;
+namespace FH.Modules.Beneficiaries.Application.DTOs;
 
 public record AddBeneficiaryRequest(
     SubjectType SubjectType,

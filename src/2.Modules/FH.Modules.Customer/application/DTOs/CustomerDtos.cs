@@ -1,7 +1,7 @@
 using FH.Shared.Domain.Entities;
 using FH.Shared.Domain.Enums;
 
-namespace FH.Api.Customer.DTOs;
+namespace FH.Modules.Customer.Application.DTOs;
 
 public record CreateCustomerRequest(
     CustomerType CustomerType,

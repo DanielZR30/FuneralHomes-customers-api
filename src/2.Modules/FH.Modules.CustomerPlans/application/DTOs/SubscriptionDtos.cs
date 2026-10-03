@@ -1,6 +1,6 @@
 using FH.Shared.Domain.Entities;
 
-namespace FH.Api.Customer.DTOs;
+namespace FH.Modules.CustomerPlans.Application.DTOs;
 
 public record CreateSubscriptionRequest(
     Guid CustomerId,
