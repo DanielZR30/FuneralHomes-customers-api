@@ -72,6 +72,9 @@ public class Beneficiary : AggregateRoot<Guid>
 
     public void Remove()
     {
+        if (Status == BeneficiaryStatus.Removed)
+            throw new BusinessRuleException("El beneficiario ya fue retirado de esta suscripción.");
+
         Status = BeneficiaryStatus.Removed;
         RemovedAt = DateTime.UtcNow;
     }
