@@ -1,5 +1,6 @@
 using FH.Shared.Domain.Common;
 using FH.Shared.Domain.Enums;
+using FH.Shared.Domain.Exceptions;
 
 namespace FH.Shared.Domain.Entities;
 
@@ -53,6 +54,20 @@ public class Beneficiary : AggregateRoot<Guid>
             memberId,
             beneficiaryType,
             relationshipType);
+    }
+
+    public static Beneficiary Enroll(
+    Guid subscriptionId,
+    Member member,
+    BeneficiaryType beneficiaryType,
+    RelationshipType relationshipType)
+    {
+        ArgumentNullException.ThrowIfNull(member);
+
+        if (member.SubjectType == SubjectType.Pet && relationshipType != RelationshipType.Pet)
+            throw new BusinessRuleException("Un sujeto de tipo Mascota (Pet) debe tener relación 'Pet'.");
+
+        return Create(subscriptionId, member.Id, beneficiaryType, relationshipType);
     }
 
     public void Remove()
