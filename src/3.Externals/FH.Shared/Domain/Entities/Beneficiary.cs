@@ -1,6 +1,7 @@
 using FH.Shared.Domain.Common;
 using FH.Shared.Domain.Enums;
 using FH.Shared.Domain.Exceptions;
+using FH.Shared.Domain.Events;
 
 namespace FH.Shared.Domain.Entities;
 
@@ -67,7 +68,17 @@ public class Beneficiary : AggregateRoot<Guid>
         if (member.SubjectType == SubjectType.Pet && relationshipType != RelationshipType.Pet)
             throw new BusinessRuleException("Un sujeto de tipo Mascota (Pet) debe tener relación 'Pet'.");
 
-        return Create(subscriptionId, member.Id, beneficiaryType, relationshipType);
+        var beneficiary = Create(subscriptionId, member.Id, beneficiaryType, relationshipType);
+
+        beneficiary.AddDomainEvent(new BeneficiaryAddedDomainEvent(
+            subscriptionId,
+            member.Id,
+            member.SubjectType,
+            member.DerivedAge,
+            relationshipType,
+            beneficiaryType));
+
+        return beneficiary;
     }
 
     public void Remove()
@@ -77,6 +88,12 @@ public class Beneficiary : AggregateRoot<Guid>
 
         Status = BeneficiaryStatus.Removed;
         RemovedAt = DateTime.UtcNow;
+
+        AddDomainEvent(new BeneficiaryRemovedDomainEvent(
+            SubscriptionId,
+            MemberId,
+            RelationshipType,
+            BeneficiaryType));
     }
 
     public void Reactivate()
