@@ -1,6 +1,7 @@
 using FH.Shared.Domain.Common;
 using FH.Shared.Domain.Enums;
 using FH.Shared.Domain.Services;
+using FH.Shared.Domain.Exceptions;
 
 namespace FH.Shared.Domain.Entities;
 
@@ -31,7 +32,7 @@ public class Member : BaseEntity<Guid>
         string? phone = null) : base(id)
     {
         if (string.IsNullOrWhiteSpace(firstName))
-            throw new ArgumentException("El nombre del miembro es obligatorio.", nameof(firstName));
+            throw new BusinessRuleException("El nombre del miembro es obligatorio.");
 
         SubjectType = subjectType;
         FirstName = firstName.Trim();
