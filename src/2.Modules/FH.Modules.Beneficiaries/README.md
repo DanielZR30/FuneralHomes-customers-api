@@ -233,3 +233,24 @@ O para una mascota:
   "relationshipType": "Pet"
 }
 ```
+---
+
+## 4. Estado de implementación (Entrega 1)
+
+**Implementado**
+- Alta de beneficiario (humano y mascota), retiro y listado con filtro por estado, como Commands/Queries con MediatR y `Result<T>`.
+- Persistencia con EF Core y PostgreSQL mediante `IBeneficiaryRepository` y `IUnitOfWork`: el `Member` y el `Beneficiary` se guardan en una sola transacción.
+- Reglas de dominio dentro de las entidades, lanzadas como `BusinessRuleException`: la mascota solo admite parentesco `Pet`, no se puede retirar dos veces, la fecha de nacimiento no puede ser futura y el nombre es obligatorio.
+- Suscripción existente y activa, y cupo máximo, validados en el handler de alta.
+- Duplicados (HU-BEN-05) por tipo y número de documento entre beneficiarios activos de la misma suscripción.
+- Eventos de dominio `BeneficiaryAddedDomainEvent` y `BeneficiaryRemovedDomainEvent`, emitidos por `Beneficiary`.
+
+**Diferencias respecto al diseño inicial**
+- `Member`, `Beneficiary`, los eventos, `DerivedAgeCalculator` y `BusinessRuleException` viven en `FH.Shared`, no dentro del módulo.
+- No hay `IMemberRepository`, validadores FluentValidation ni consulta `GetMemberById`: las validaciones están en el dominio y en los handlers.
+- Los duplicados se detectan por documento y no por `memberId`, porque cada alta crea un `Member` nuevo.
+
+**Límites conocidos y pendiente**
+- Las mascotas no tienen documento, por lo que no se verifica duplicidad para ellas.
+- El registro en `beneficiary_audit_log` está a cargo del módulo Audit, que debe escuchar los eventos de dominio.
+- La actualización de datos de un beneficiario (`BENEFICIARY_UPDATED`) no está implementada.

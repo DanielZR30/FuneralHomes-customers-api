@@ -26,3 +26,13 @@ public sealed record BeneficiaryRemovedDomainEvent(
     public DateTime OccurredOn { get; } = DateTime.UtcNow;
     public string EventType => "BENEFICIARY_REMOVED";
 }
+
+public sealed record BeneficiaryUpdatedDomainEvent(
+    Guid SubscriptionId,
+    Guid MemberId,
+    int DerivedAge) : IDomainEvent
+{
+    public Guid EventId { get; } = Guid.NewGuid();
+    public DateTime OccurredOn { get; } = DateTime.UtcNow;
+    public string EventType => "BENEFICIARY_UPDATED";
+}

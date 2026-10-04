@@ -35,15 +35,17 @@ public class BeneficiaryRepository : IBeneficiaryRepository
     }
 
     public async Task<bool> ExistsActiveByIdentificationAsync(
-    Guid subscriptionId,
-    string identificationType,
-    string identificationNumber,
-    CancellationToken cancellationToken = default)
+        Guid subscriptionId,
+        string identificationType,
+        string identificationNumber,
+        CancellationToken cancellationToken = default,
+        Guid? excludeMemberId = null)
     {
         return await _context.Beneficiaries
             .AnyAsync(
                 b => b.SubscriptionId == subscriptionId
                      && b.Status == BeneficiaryStatus.Active
+                     && (excludeMemberId == null || b.MemberId != excludeMemberId)
                      && b.Member!.IdentificationType == identificationType
                      && b.Member.IdentificationNumber == identificationNumber,
                 cancellationToken);
@@ -55,6 +57,7 @@ public class BeneficiaryRepository : IBeneficiaryRepository
         CancellationToken cancellationToken = default)
     {
         return await _context.Beneficiaries
+            .Include(b => b.Member)
             .FirstOrDefaultAsync(
                 b => b.SubscriptionId == subscriptionId && b.MemberId == memberId,
                 cancellationToken);

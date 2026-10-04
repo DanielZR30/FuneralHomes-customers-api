@@ -96,6 +96,26 @@ public class Beneficiary : AggregateRoot<Guid>
             BeneficiaryType));
     }
 
+    public void UpdateMemberDetails(
+    string firstName,
+    DateOnly birthDate,
+    string? lastName,
+    string? identificationType,
+    string? identificationNumber,
+    string? email,
+    string? phone)
+    {
+        if (Status != BeneficiaryStatus.Active)
+            throw new BusinessRuleException("Solo se pueden modificar los datos de un beneficiario activo.");
+
+        if (Member is null)
+            throw new InvalidOperationException("Los datos del miembro no fueron cargados.");
+
+        Member.UpdateDetails(firstName, birthDate, lastName, identificationType, identificationNumber, email, phone);
+
+        AddDomainEvent(new BeneficiaryUpdatedDomainEvent(SubscriptionId, MemberId, Member.DerivedAge));
+    }
+
     public void Reactivate()
     {
         Status = BeneficiaryStatus.Active;

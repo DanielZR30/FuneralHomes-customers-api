@@ -28,5 +28,6 @@ public interface IBeneficiaryRepository
         Guid subscriptionId,
         string identificationType,
         string identificationNumber,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default,
+        Guid? excludeMemberId = null);
 }
