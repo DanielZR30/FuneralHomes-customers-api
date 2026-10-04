@@ -1,3 +1,5 @@
+using FH.Shared.Domain.Exceptions;
+
 namespace FH.Shared.Domain.Services;
 
 public static class DerivedAgeCalculator
@@ -7,7 +9,7 @@ public static class DerivedAgeCalculator
         var targetDate = asOfDate ?? DateOnly.FromDateTime(DateTime.UtcNow);
 
         if (birthDate > targetDate)
-            throw new ArgumentException("La fecha de nacimiento no puede ser posterior a la fecha actual.", nameof(birthDate));
+            throw new BusinessRuleException("La fecha de nacimiento no puede ser posterior a la fecha actual.");
 
         var age = targetDate.Year - birthDate.Year;
 

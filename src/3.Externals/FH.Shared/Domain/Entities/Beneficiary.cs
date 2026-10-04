@@ -1,5 +1,7 @@
 using FH.Shared.Domain.Common;
 using FH.Shared.Domain.Enums;
+using FH.Shared.Domain.Exceptions;
+using FH.Shared.Domain.Events;
 
 namespace FH.Shared.Domain.Entities;
 
@@ -55,10 +57,63 @@ public class Beneficiary : AggregateRoot<Guid>
             relationshipType);
     }
 
+    public static Beneficiary Enroll(
+    Guid subscriptionId,
+    Member member,
+    BeneficiaryType beneficiaryType,
+    RelationshipType relationshipType)
+    {
+        ArgumentNullException.ThrowIfNull(member);
+
+        if (member.SubjectType == SubjectType.Pet && relationshipType != RelationshipType.Pet)
+            throw new BusinessRuleException("Un sujeto de tipo Mascota (Pet) debe tener relación 'Pet'.");
+
+        var beneficiary = Create(subscriptionId, member.Id, beneficiaryType, relationshipType);
+
+        beneficiary.AddDomainEvent(new BeneficiaryAddedDomainEvent(
+            subscriptionId,
+            member.Id,
+            member.SubjectType,
+            member.DerivedAge,
+            relationshipType,
+            beneficiaryType));
+
+        return beneficiary;
+    }
+
     public void Remove()
     {
+        if (Status == BeneficiaryStatus.Removed)
+            throw new BusinessRuleException("El beneficiario ya fue retirado de esta suscripción.");
+
         Status = BeneficiaryStatus.Removed;
         RemovedAt = DateTime.UtcNow;
+
+        AddDomainEvent(new BeneficiaryRemovedDomainEvent(
+            SubscriptionId,
+            MemberId,
+            RelationshipType,
+            BeneficiaryType));
+    }
+
+    public void UpdateMemberDetails(
+    string firstName,
+    DateOnly birthDate,
+    string? lastName,
+    string? identificationType,
+    string? identificationNumber,
+    string? email,
+    string? phone)
+    {
+        if (Status != BeneficiaryStatus.Active)
+            throw new BusinessRuleException("Solo se pueden modificar los datos de un beneficiario activo.");
+
+        if (Member is null)
+            throw new InvalidOperationException("Los datos del miembro no fueron cargados.");
+
+        Member.UpdateDetails(firstName, birthDate, lastName, identificationType, identificationNumber, email, phone);
+
+        AddDomainEvent(new BeneficiaryUpdatedDomainEvent(SubscriptionId, MemberId, Member.DerivedAge));
     }
 
     public void Reactivate()

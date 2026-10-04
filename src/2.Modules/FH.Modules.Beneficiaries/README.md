@@ -122,6 +122,33 @@ El módulo `FH.Modules.Beneficiaries` es responsable de la administración de la
 
 ---
 
+### HU-BEN-06: Actualización de Datos de un Beneficiario
+* **Como** Titular del Plan o Agente de Operaciones,
+* **Quiero** corregir los datos de un beneficiario activo (nombre, documento, fecha de nacimiento y contacto),
+* **Para** mantener la información correcta sin tener que retirarlo y volver a afiliarlo.
+
+#### Criterios de Aceptación:
+* **Escenario 1: Actualización exitosa**
+  - **Dado** un beneficiario con estado `Active`,
+  - **Cuando** se envían los nuevos datos a `PUT /api/v1/subscriptions/{subscriptionId}/beneficiaries/{memberId}`,
+  - **Entonces** se actualizan los datos, se recalcula la edad derivada si cambió la fecha de nacimiento, se emite `BeneficiaryUpdatedDomainEvent` y se retorna HTTP 200 OK.
+* **Escenario 2: Beneficiario retirado**
+  - **Dado** un beneficiario con estado `Removed`,
+  - **Cuando** se intenta actualizar,
+  - **Entonces** se rechaza con HTTP 409 Conflict.
+* **Escenario 3: Documento de otro beneficiario**
+  - **Dado** un documento que ya pertenece a otro beneficiario activo de la misma suscripción,
+  - **Cuando** se intenta actualizar,
+  - **Entonces** se rechaza con HTTP 409 Conflict y no se guarda ningún cambio.
+* **Escenario 4: Datos inválidos**
+  - **Dado** una fecha de nacimiento futura o un nombre vacío,
+  - **Cuando** se valida la solicitud,
+  - **Entonces** se rechaza con HTTP 400 Bad Request y no se guarda ningún cambio.
+
+> El tipo de sujeto y el parentesco no se modifican en esta operación.
+
+---
+
 ## 3. Explicación Técnica y Arquitectura
 
 ### 3.1 Estructura Interna del Módulo (DDD)
@@ -207,6 +234,7 @@ public static int CalculateAge(DateTime birthDate, DateTime? currentDate = null)
 | `POST` | `/api/v1/subscriptions/{subscriptionId}/beneficiaries` | Incorporar beneficiario (humano o mascota) | `201 Created` | `400`, `404`, `409` |
 | `GET` | `/api/v1/subscriptions/{subscriptionId}/beneficiaries` | Listar grupo cubierto de una suscripción | `200 OK` | `404` |
 | `DELETE` | `/api/v1/subscriptions/{subscriptionId}/beneficiaries/{memberId}` | Desafiliar beneficiario | `200 OK` / `204` | `404`, `409` |
+| `PUT` | `/api/v1/subscriptions/{subscriptionId}/beneficiaries/{memberId}` | Actualizar datos de un beneficiario activo | `200 OK` | `400`, `404`, `409` |
 
 #### Payload de Ejemplo (`POST .../beneficiaries`):
 ```json
@@ -233,3 +261,26 @@ O para una mascota:
   "relationshipType": "Pet"
 }
 ```
+---
+
+
+## 4. Estado de implementación (Entrega 1)
+
+**Implementado**
+- Alta, actualización, retiro y listado con filtro por estado, como Commands/Queries con MediatR y `Result<T>`.
+- Persistencia con EF Core y PostgreSQL mediante `IBeneficiaryRepository` y `IUnitOfWork`: el `Member` y el `Beneficiary` se guardan en una sola transacción.
+- Reglas de dominio dentro de las entidades, lanzadas como `BusinessRuleException`: la mascota solo admite parentesco `Pet`, no se puede retirar dos veces, la fecha de nacimiento no puede ser futura, el nombre es obligatorio y solo se editan beneficiarios activos.
+- Suscripción existente y activa, y cupo máximo, validados en el handler de alta.
+- Duplicados por tipo y número de documento entre beneficiarios activos de la misma suscripción, tanto en el alta como en la actualización.
+- Eventos de dominio `BeneficiaryAddedDomainEvent`, `BeneficiaryRemovedDomainEvent` y `BeneficiaryUpdatedDomainEvent`, emitidos por `Beneficiary`.
+- Colección de endpoints con casos exitosos y de error en `docs/ENDPOINTS.md`.
+
+**Diferencias respecto al diseño inicial**
+- `Member`, `Beneficiary`, los eventos, `DerivedAgeCalculator` y `BusinessRuleException` viven en `FH.Shared`, no dentro del módulo.
+- No hay `IMemberRepository`, validadores FluentValidation ni consulta `GetMemberById`: las validaciones están en el dominio y en los handlers.
+- Los duplicados se detectan por documento y no por `memberId`, porque cada alta crea un `Member` nuevo.
+- La actualización solo modifica datos del miembro: el tipo de sujeto y el parentesco no cambian.
+
+**Límites conocidos y pendiente**
+- Las mascotas no tienen documento, por lo que no se verifica duplicidad para ellas.
+- El registro en `beneficiary_audit_log` está a cargo del módulo Audit, que debe escuchar los tres eventos de dominio.
