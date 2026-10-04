@@ -7,6 +7,7 @@ using FH.Shared.MockData;
 using FH.Shared.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
+using FH.Shared.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,10 @@ builder.Services.AddCustomerPlansModule(builder.Configuration);
 builder.Services.AddBeneficiariesModule(builder.Configuration);
 builder.Services.AddAuditModule(builder.Configuration);
 builder.Services.AddMessagingModule(builder.Configuration);
+
+// Infraestructura compartida: Repository + Unit of Work y MediatR (CQRS)
+builder.Services.AddSharedRepositories();
+builder.Services.AddSharedCqrs(typeof(BeneficiariesModuleExtensions).Assembly);
 
 // Configuración de serialización JSON con Enums legibles (ej: "Individual", "Human", "Child")
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
