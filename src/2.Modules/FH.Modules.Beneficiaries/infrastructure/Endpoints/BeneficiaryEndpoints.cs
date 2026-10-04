@@ -1,5 +1,6 @@
 using FH.Modules.Beneficiaries.Application.Commands.AddBeneficiary;
 using FH.Modules.Beneficiaries.Application.Commands.RemoveBeneficiary;
+using FH.Modules.Beneficiaries.Application.Commands.UpdateBeneficiary;
 using FH.Modules.Beneficiaries.Application.DTOs;
 using FH.Modules.Beneficiaries.Application.Queries.GetBeneficiariesBySubscription;
 using FH.Shared.Application.Common;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using static FH.Modules.Beneficiaries.Application.DTOs.BeneficiaryResponse;
 
 namespace FH.Modules.Beneficiaries.Infrastructure.Endpoints;
 
@@ -92,6 +94,36 @@ public static class BeneficiaryEndpoints
         .WithName("RemoveBeneficiary")
         .WithSummary("Desafiliar a un beneficiario de una suscripción funeraria")
         .Produces(StatusCodes.Status204NoContent)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .ProducesProblem(StatusCodes.Status409Conflict);
+
+        // PUT /api/v1/subscriptions/{subscriptionId}/beneficiaries/{memberId} - Actualizar datos de un beneficiario
+        group.MapPut("/{memberId:guid}", async (
+            Guid subscriptionId,
+            Guid memberId,
+            UpdateBeneficiaryRequest request,
+            ISender sender,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new UpdateBeneficiaryCommand(
+                subscriptionId,
+                memberId,
+                request.FirstName,
+                request.BirthDate,
+                request.LastName,
+                request.IdentificationType,
+                request.IdentificationNumber,
+                request.Email,
+                request.Phone);
+
+            var result = await sender.Send(command, cancellationToken);
+
+            return result.IsFailure ? ToError(result) : Results.Ok(result.Value);
+        })
+        .WithName("UpdateBeneficiary")
+        .WithSummary("Actualizar los datos de un beneficiario activo (el tipo de sujeto y el parentesco no cambian)")
+        .Produces<BeneficiaryResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .ProducesProblem(StatusCodes.Status409Conflict);
 

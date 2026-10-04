@@ -47,4 +47,14 @@ public record BeneficiaryResponse(
             beneficiary.Status.ToString(),
             beneficiary.JoinedAt,
             beneficiary.RemovedAt);
+
+
+    public record UpdateBeneficiaryRequest(
+    string FirstName,
+    DateOnly BirthDate,
+    string? LastName = null,
+    string? IdentificationType = null,
+    string? IdentificationNumber = null,
+    string? Email = null,
+    string? Phone = null);
 }
