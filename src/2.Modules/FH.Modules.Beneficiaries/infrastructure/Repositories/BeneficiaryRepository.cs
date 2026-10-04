@@ -34,6 +34,21 @@ public class BeneficiaryRepository : IBeneficiaryRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<bool> ExistsActiveByIdentificationAsync(
+    Guid subscriptionId,
+    string identificationType,
+    string identificationNumber,
+    CancellationToken cancellationToken = default)
+    {
+        return await _context.Beneficiaries
+            .AnyAsync(
+                b => b.SubscriptionId == subscriptionId
+                     && b.Status == BeneficiaryStatus.Active
+                     && b.Member!.IdentificationType == identificationType
+                     && b.Member.IdentificationNumber == identificationNumber,
+                cancellationToken);
+    }
+
     public async Task<Beneficiary?> GetAsync(
         Guid subscriptionId,
         Guid memberId,

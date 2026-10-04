@@ -23,4 +23,10 @@ public interface IBeneficiaryRepository
         Member member,
         Beneficiary beneficiary,
         CancellationToken cancellationToken = default);
+
+    Task<bool> ExistsActiveByIdentificationAsync(
+        Guid subscriptionId,
+        string identificationType,
+        string identificationNumber,
+        CancellationToken cancellationToken = default);
 }
