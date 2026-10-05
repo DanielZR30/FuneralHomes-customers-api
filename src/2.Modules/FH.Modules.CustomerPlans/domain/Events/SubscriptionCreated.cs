@@ -1,0 +1,16 @@
+using FH.Shared.Domain.Common;
+
+namespace FH.Modules.CustomerPlans.Domain.Events;
+
+public sealed record SubscriptionCreated(
+    Guid SubscriptionId,
+    Guid CustomerId,
+    Guid ExternalPlanId,
+    int MaxBeneficiaries,
+    DateOnly StartDate,
+    DateOnly? EndDate) : IDomainEvent
+{
+    public Guid EventId { get; } = Guid.NewGuid();
+    public DateTime OccurredOn { get; } = DateTime.UtcNow;
+    public string EventType => nameof(SubscriptionCreated);
+}
