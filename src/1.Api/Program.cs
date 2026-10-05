@@ -35,7 +35,9 @@ builder.Services.AddMessagingModule(builder.Configuration);
 
 // Infraestructura compartida: Repository + Unit of Work y MediatR (CQRS)
 builder.Services.AddSharedRepositories();
-builder.Services.AddSharedCqrs(typeof(BeneficiariesModuleExtensions).Assembly);
+builder.Services.AddSharedCqrs(
+    typeof(BeneficiariesModuleExtensions).Assembly,
+    typeof(CustomerModuleExtensions).Assembly);
 
 // Configuración de serialización JSON con Enums legibles (ej: "Individual", "Human", "Child")
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
