@@ -1,3 +1,5 @@
+using FH.Modules.CustomerPlans.Application;
+using FH.Modules.CustomerPlans.Infrastructure;
 using FH.Modules.CustomerPlans.Infrastructure.Endpoints;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -9,7 +11,8 @@ public static class CustomerPlansModuleExtensions
 {
     public static IServiceCollection AddCustomerPlansModule(this IServiceCollection services, IConfiguration? configuration = null)
     {
-        // Registro de servicios de aplicación y repositorios del módulo CustomerPlans
+        services.AddCustomerPlansApplicationServices();
+        services.AddCustomerPlansPersistenceServices(configuration);
         return services;
     }
 
