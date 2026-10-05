@@ -20,4 +20,7 @@
     <Project Path="src/3.Externals/FH.Shared/FH.Shared.csproj" />
     <Project Path="src/3.Externals/FH.Modules.Messaging/FH.Modules.Messaging.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FH.Modules.CustomerPlans.Tests/FH.Modules.CustomerPlans.Tests.csproj" />
+  </Folder>
 </Solution>
