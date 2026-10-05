@@ -1,201 +1,125 @@
 # Módulo de Customer (`FH.Modules.Customer`)
 
-Este módulo forma parte del microservicio **Customers** (`fh.api.customer`) y está diseñado bajo los principios de **Domain-Driven Design (DDD)** y **Clean Architecture**. Su propósito central es gobernar el ciclo de vida demográfico, legal y de contacto de los clientes titulares.
+Módulo del microservicio **Customers** (`fh.api.customer`).Gobierna el ciclo de vida demográfico, legal y de contacto de los clientes titulares de planes funerarios, bajo **DDD**, **Clean Architecture** y **CQRS** con MediatR.
 
 ---
 
-## 1. Responsabilidades del Módulo
+## 1. Responsabilidades
 
-El módulo `FH.Modules.Customer` es el **único dueño y fuente de la verdad** para la administración de las cuentas y titulares de planes funerarios:
+1. **Gestión integral de titulares** (B2C y B2B): registro y mantenimiento de personas naturales (`Individual`) y personas jurídicas (`Corporate`).
+2. **Validación de identidad y unicidad**: unicidad de la pareja `(tipo de documento, número)` y normalización de la identificación.
+3. **Mantenimiento demográfico y de contacto**: actualización de nombre, correo, teléfono y dirección.
+4. **Gobierno del ciclo de vida**: control de las transiciones `Active`, `Suspended` e `Inactive`.
 
-1. **Gestión Integral de Titulares (B2C y B2B)**:
-   - Registro y mantenimiento de personas naturales (`INDIVIDUAL`).
-   - Registro y mantenimiento de empresas/personas jurídicas (`CORPORATE`).
-2. **Validación de Identidad y Unicidad**:
-   - Garantizar la unicidad del número de identificación por tipo de documento a nivel de sistema.
-   - Normalización de datos de identidad (cédula, pasaporte, NIT, RUT, etc.).
-3. **Mantenimiento Demográfico y de Contacto**:
-   - Actualización controlada de canales de comunicación (teléfono, correo electrónico, dirección física).
-   - Inmutabilidad estricta de documentos de identificación tras la creación para cumplimiento legal y auditoría.
-4. **Gobierno del Ciclo de Vida del Cliente**:
-   - Transiciones de estado permitidas: `Active`, `Inactive`, `Suspended`.
-   - Control de habilitación para emitir nuevas suscripciones a planes funerarios.
+La entidad de dominio y su configuración de persistencia viven en `FH.Shared` (`FH.Shared.Domain.Entities.Customer`), porque `CustomerDbContext` es compartido con los módulos de Suscripciones y Planes. El módulo aporta el **caso de uso**; el núcleo conserva el **modelo**.
 
 ---
 
-## 2. Historias de Usuario (User Stories)
+## 2. Reglas de negocio implementadas
 
-### HU-CUS-01: Registro de Cliente Titular Persona Natural (B2C)
-* **Como** Asesor Comercial o Usuario del Canal Digital,  
-* **Quiero** registrar a una persona natural con sus datos demográficos e identificación,  
-* **Para** habilitarlo como titular de suscripciones a planes de previsión funeraria.
+| Regla | Descripción | Respuesta HTTP |
+|---|---|---|
+| RN-01 | El nombre del titular es obligatorio y no puede ser blanco | `400` |
+| RN-02 | Tipo y número de identificación son obligatorios | `400` |
+| RN-03 | La pareja `(tipo, número)` es única en todo el sistema | `409` |
+| RN-04 | En la actualización el nombre no puede quedar blanco | `400` |
+| RN-05 | La identificación es **inmutable** tras la creación | — (no se expone en el payload de actualización) |
+| RN-06 | Solicitar el estado actual es idempotente: `204` sin escribir en base de datos | `204` |
+| RN-07 | `Inactive` es terminal: no admite reapertura ni suspensión | `409` |
+| RN-08 | La consulta por identificación exige ambos parámetros | `400` |
 
-#### Criterios de Aceptación (Gherkin):
-* **Escenario 1: Creación exitosa de cliente persona natural**
-  - **Dado** que se proporcionan nombre completo, tipo de documento válido, número de documento no registrado previamente, y datos de contacto,
-  - **Cuando** se solicita el registro a través de la API,
-  - **Entonces** el sistema debe crear la entidad con `CustomerType = Individual`, estado inicial `Active`, generar un UUID único, registrar la fecha de creación en UTC y responder con HTTP 201 Created.
-* **Escenario 2: Intento de registro con identificación duplicada**
-  - **Dado** que ya existe un cliente registrado con el mismo tipo y número de identificación,
-  - **Cuando** se envía la solicitud de creación,
-  - **Entonces** el sistema debe rechazar la operación y retornar HTTP 409 Conflict indicando la duplicidad.
-* **Escenario 3: Datos obligatorios faltantes o inválidos**
-  - **Dado** que el nombre está vacío o el formato del correo electrónico es inválido,
-  - **Cuando** se valida la solicitud,
-  - **Entonces** el sistema debe rechazar el comando con HTTP 400 Bad Request y la lista de errores de validación.
-
-#### Tareas Técnicas:
-- [ ] Implementar `CreateCustomerCommand` y su validador con FluentValidation.
-- [ ] Implementar `Customer.Create(...)` respetando invariantes en la capa de Dominio.
-- [ ] Verificar existencia previa en `ICustomerRepository.ExistsByIdentificationAsync(...)`.
-- [ ] Exponer endpoint `POST /api/v1/customers`.
+Normalización aplicada en el límite de datos (`CustomerRepository`): el tipo de documento se recorta y se pasa a mayúsculas, el número se recorta, y el correo electrónico se almacena en minúsculas.
 
 ---
 
-### HU-CUS-02: Registro de Cliente Corporativo (B2B)
-* **Como** Ejecutivo de Cuentas Corporativas,  
-* **Quiero** registrar una empresa con su NIT/RUT y razón social,  
-* **Para** que la organización pueda adquirir planes colectivos para sus colaboradores.
-
-#### Criterios de Aceptación:
-* **Escenario 1: Creación de cliente corporativo exitosa**
-  - **Dado** un NIT corporativo, razón social y datos de sede principal válidos,
-  - **Cuando** se envía el comando con `CustomerType = Corporate`,
-  - **Entonces** se crea la cuenta corporativa con estado `Active` y se genera el registro en la base de datos.
-* **Escenario 2: NIT duplicado**
-  - **Dado** una empresa ya existente en base de datos con el mismo NIT,
-  - **Cuando** se intenta volver a registrar,
-  - **Entonces** se responde con HTTP 409 Conflict.
-
----
-
-### HU-CUS-03: Consulta de Ficha del Cliente
-* **Como** Agente de Servicio o Microservicio dependiente,  
-* **Quiero** consultar los datos de un cliente mediante su ID único o su número de documento,  
-* **Para** validar su estado actual y detalles de contacto antes de operar sobre sus pólizas.
-
-#### Criterios de Aceptación:
-* **Escenario 1: Cliente encontrado por ID**
-  - **Dado** un UUID de cliente existente en el sistema,
-  - **Cuando** se consulta `GET /api/v1/customers/{id}`,
-  - **Entonces** el sistema retorna HTTP 200 OK con el DTO detallado del cliente.
-* **Escenario 2: Cliente no encontrado**
-  - **Dado** un identificador que no existe en la base de datos,
-  - **Cuando** se ejecuta la consulta,
-  - **Entonces** se debe responder con HTTP 404 Not Found.
-
-#### Tareas Técnicas:
-- [ ] Implementar `GetCustomerByIdQuery` y `GetCustomerByIdentificationQuery`.
-- [ ] Implementar métodos en el repositorio `ICustomerRepository.GetByIdAsync(...)`.
-- [ ] Exponer endpoints `GET /api/v1/customers/{id}` y `GET /api/v1/customers/by-identification`.
-
----
-
-### HU-CUS-04: Actualización de Datos Demográficos y de Contacto
-* **Como** Titular del Plan o Agente de Operaciones,  
-* **Quiero** actualizar el teléfono, correo electrónico y dirección de residencia del titular,  
-* **Para** asegurar que las notificaciones y cobros lleguen a los canales correctos.
-
-#### Criterios de Aceptación:
-* **Escenario 1: Actualización válida de datos de contacto**
-  - **Dado** un cliente existente en estado `Active`,
-  - **Cuando** se envía el comando `PUT /api/v1/customers/{id}` con nuevos valores de email, teléfono o dirección,
-  - **Entonces** el sistema actualiza dichos campos mediante el método de dominio `UpdateDemographics(...)` y retorna HTTP 200 OK o 204 No Content.
-* **Escenario 2: Intento de alteración de identificación**
-  - **Dado** un intento de modificar el número o tipo de identificación en el payload de actualización demográfica,
-  - **Cuando** se procesa la solicitud,
-  - **Entonces** la identificación debe permanecer inalterada (inmutable por diseño de dominio).
-
----
-
-### HU-CUS-05: Modificación del Estado del Cliente (Suspender / Inactivar / Reactivar)
-* **Como** Oficial de Cumplimiento o Administrador,  
-* **Quiero** suspender o reactivar la cuenta de un cliente,  
-* **Para** bloquear transacciones o rehabilitar el servicio según su condición comercial o legal.
-
-#### Criterios de Aceptación:
-* **Escenario 1: Suspensión de cuenta**
-  - **Dado** un cliente activo,
-  - **Cuando** se solicita su suspensión indicando el motivo,
-  - **Entonces** el cliente pasa a estado `CustomerStatus.Suspended`.
-
----
-
-## 3. Explicación Técnica y Arquitectura
-
-### 3.1 Estructura Interna del Módulo (DDD)
-El módulo reside en `src/2.Modules/FH.Modules.Customer` y respeta la arquitectura en capas:
+## 3. Estructura real del módulo
 
 ```text
 FH.Modules.Customer/
-├── domain/                      # Reglas de negocio puras e invariantes
-│   ├── Entities/                # Customer (derivado de AggregateRoot<Guid>)
-│   ├── Enums/                   # CustomerType, CustomerStatus
-│   ├── Repositories/            # Contrato ICustomerRepository
-│   └── Exceptions/              # CustomerNotFoundException, DuplicateCustomerException
-│
-├── application/                 # Orquestación de casos de uso (CQRS)
+├── domain/
+│   └── Repositories/
+│       └── ICustomerRepository.cs      # Contrato especializado (varias operaciones de lectura)
+├── application/
+│   ├── DTOs/
+│   │   └── CustomerDtos.cs             # Requests y Responses
 │   ├── Commands/
-│   │   ├── CreateCustomer/      # Command, CommandHandler, Validator
-│   │   ├── UpdateDemographics/  # Command, CommandHandler, Validator
-│   │   └── ChangeStatus/        # Command, CommandHandler
-│   ├── Queries/
-│   │   ├── GetCustomerById/     # Query, QueryHandler, DTO
-│   │   └── GetCustomerByIdentification/
-│   └── Mappings/                # Mapeo Entidad <-> DTO
-│
-├── infrastructure/              # Adaptadores de persistencia y externos
-│   ├── Repositories/            # Implementación CustomerRepository con EF Core
-│   └── Persistence/             # Mapeos IEntityTypeConfiguration<Customer>
-│
-└── README.md                    # Documentación técnica del módulo
+│   │   ├── CreateCustomer/             # Command + Handler  -> 201
+│   │   ├── UpdateCustomerDemographics/ # Command + Handler  -> 200
+│   │   └── ChangeCustomerStatus/       # Command + Handler  -> 204
+│   └── Queries/
+│       ├── GetCustomerById/            # Query + Handler    -> 200
+│       ├── GetCustomerByIdentification/# Query + Handler    -> 200
+│       └── GetCustomers/               # Query + Handler    -> 200
+├── infrastructure/
+│   ├── Repositories/
+│   │   └── CustomerRepository.cs       # Adaptador EF Core sobre CustomerDbContext
+│   └── Endpoints/
+│       └── CustomerEndpoints.cs        # Capa HTTP fina, sin lógica de negocio
+└── Extensions/
+    └── CustomerModuleExtensions.cs     # Registro de DI
 ```
 
-### 3.2 Modelo de Datos (`fh.db.customer`)
-El módulo mapea directamente contra la tabla `customers`:
+**Decisiones de diseño relevantes**
 
-```sql
-CREATE TABLE customers (
-    id UUID PRIMARY KEY,
-    customer_type VARCHAR(20) NOT NULL CHECK (customer_type IN ('INDIVIDUAL', 'CORPORATE')),
-    name VARCHAR(255) NOT NULL,
-    identification_type VARCHAR(20) NOT NULL,
-    identification_number VARCHAR(50) NOT NULL UNIQUE,
-    email VARCHAR(100),
-    phone VARCHAR(30),
-    address VARCHAR(255),
-    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
+- **Sin FluentValidation.** La validación se hace con `Result<T>` (`FH.Shared`) en los handlers, siguiendo el patrón vigente de `FH.Modules.Beneficiaries`. Incorporar FluentValidation aquí sería una decisión de arquitectura que afecta a toda la solución y debe tomarla el equipo, no este módulo.
+- **Normalización en el repositorio, no en los handlers.** Así ningún llamador puede omitirla; los handlers solo orquestan y traducen errores.
+- **Sin excepciones propias.** Los handlers devuelven `Result<T>` con el código HTTP ya resuelto; la capa HTTP solo serializa.
+- **`Inactive` es terminal en el dominio.** La transición se rechaza en `Customer.Deactivate/Suspend/Activate`.
 
-CREATE UNIQUE INDEX uq_customers_identification 
-ON customers(identification_type, identification_number);
-```
+---
 
-### 3.3 Contratos y Endpoints REST
+## 4. Endpoints
 
-| Método | Endpoint | Descripción | Respuesta Exitosa | Códigos de Error |
+| Método | Ruta | Descripción | Éxito | Errores |
 |---|---|---|---|---|
-| `POST` | `/api/v1/customers` | Registrar nuevo titular (B2C/B2B) | `201 Created` | `400`, `409` |
-| `GET` | `/api/v1/customers/{id}` | Consultar cliente por UUID | `200 OK` | `404` |
-| `GET` | `/api/v1/customers/by-identification` | Consultar por tipo y número de documento | `200 OK` | `400`, `404` |
-| `PUT` | `/api/v1/customers/{id}` | Actualizar datos demográficos | `200 OK` | `400`, `404` |
-| `PATCH` | `/api/v1/customers/{id}/status` | Cambiar estado (Active/Suspended/Inactive) | `204 No Content` | `400`, `404` |
+| `POST` | `/api/v1/customers` | Registrar titular (B2C/B2B) | `201` | `400`, `409` |
+| `GET` | `/api/v1/customers` | Listar todos, o filtrar con `?status=` | `200` | `400` |
+| `GET` | `/api/v1/customers/{id}` | Consultar por UUID | `200` | `404` |
+| `GET` | `/api/v1/customers/by-identification` | Consultar por `?type=&number=` | `200` | `400`, `404` |
+| `PUT` | `/api/v1/customers/{id}` | Actualizar datos de contacto y nombre | `200` | `400`, `404` |
+| `PATCH` | `/api/v1/customers/{id}/status` | Cambiar estado | `204` | `400`, `404`, `409` |
 
-#### Payload de Ejemplo (`POST /api/v1/customers`):
-```json
-{
-  "customerType": "Individual",
-  "name": "Carlos Rodríguez",
-  "identificationType": "CC",
-  "identificationNumber": "1020304050",
-  "email": "carlos.rodriguez@example.com",
-  "phone": "+573001234567",
-  "address": "Calle 45 # 12-34, Bogotá"
-}
+Ejemplos listos para ejecutar en [`FH.Api.Customer.http`](../../1.Api/FH.Api.Customer.http), que cubre los casos felices y **todos** los errores de dominio. Swagger disponible en `/swagger` con la especificación OpenAPI 3.
+
+---
+
+## 5. Pruebas
+
+```bash
+dotnet test FuneralHomes.Customers.slnx
 ```
 
-### 3.4 Invariantes y Reglas de Dominio
-- **Identificación Inmutable**: Una vez creado el titular, su identificación no se altera directamente. Si hubiese un error tipográfico en el documento, se requiere proceso formal de rectificación administrativa.
-- **Normalización**: Los correos electrónicos se almacenan en minúsculas (`ToLowerInvariant()`) y los números de documento sin espacios ni caracteres especiales innecesarios.
-- **Integración con Shared**: Reutiliza las entidades base de `FH.Shared.Domain.Entities.Customer` y `AggregateRoot<TId>` para garantizar consistencia con `CustomerDbContext`.
+**36 pruebas, todas en verde.** Suite en `tests/FH.Modules.Customer.Tests`:
+
+- `Domain/CustomerEntityTests.cs`: normalización, estado inicial y transiciones de la entidad.
+- `Application/CreateCustomerCommandHandlerTests.cs`: creación, duplicado (RN-03), campos obligatorios y traducción de `DbUpdateException`.
+- `Application/UpdateAndChangeStatusCommandHandlerTests.cs`: actualización e inmutabilidad (RN-05), idempotencia (RN-06) y terminalidad (RN-07).
+- `Application/QueriesHandlerTests.cs`: consulta por id y por identificación, y listado con filtro.
+
+Además de las pruebas unitarias, los seis endpoints se verificaron end-to-end contra PostgreSQL 16 con la migración `20261003181200_InitialCreate` aplicada, confirmando los códigos de la tabla anterior y las ocho reglas de negocio.
+
+---
+
+## 6. Pendiente de decisión del equipo
+
+> **Discrepancia entre RN-03 y el índice en base de datos.**
+> `CustomerConfiguration` declara `IX_customers_identification_number` como `UNIQUE` **solo sobre `identification_number`**, mientras que RN-03 define la unicidad sobre la pareja `(identification_type, identification_number)`.
+>
+> Consecuencia verificada: un cliente `Corporate` con `NIT = 555000111` es rechazado con `409` si ya existe un `Individual` con `CC = 555000111`. La base de datos es **más estricta** que la regla de negocio.
+>
+> `CreateCustomerCommandHandler` mitiga el efecto: valida la pareja antes de insertar y traduce un `DbUpdateException` del índice a `409`, de modo que nunca se filtra un `500`. Aun así, **el módulo no puede registrar una combinación legítimamente válida** hasta que se corrija el índice.
+>
+> Corrección propuesta (una sola migración):
+>
+> ```sql
+> DROP INDEX IX_customers_identification_number;
+> CREATE UNIQUE INDEX IX_customers_identification
+>     ON customers (identification_type, identification_number);
+> ```
+>
+> No se aplicó porque `FH.Shared` es base compartida y la migración afectaría a los módulos de Suscripciones y Planes.
+
+### Otros puntos a alinear antes de integrar
+
+- **`Program.cs` y `FuneralHomes.Customers.slnx`**: el PR abierto de `customer-plans` (#3) modifica las mismas líneas. Al integrar hay que conservar los ensamblados y proyectos de prueba de ambos módulos.
+- **`GET /api/v1/customers` no pagina**: usa el almacén en memoria compartido. Con volumen real conviene añadir paginación y filtro por texto antes de exponerlo a clientes externos.
