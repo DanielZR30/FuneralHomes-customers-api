@@ -1,5 +1,8 @@
 using FH.Modules.Audit.Application.DTOs;
-using FH.Shared.MockData;
+using FH.Modules.Audit.Application.Queries.GetMemberAuditLog;
+using FH.Modules.Audit.Application.Queries.GetSubscriptionAuditLog;
+using FH.Shared.Application.Common;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -13,27 +16,41 @@ public static class AuditEndpoints
         var group = routes.MapGroup("/api/v1/subscriptions/{subscriptionId:guid}/audit-log")
             .WithTags("Audit");
 
-        // GET /api/v1/subscriptions/{subscriptionId}/audit-log - Historial de novedades de una suscripción
-        group.MapGet("/", (Guid subscriptionId, InMemoryCustomerStore store) =>
+        group.MapGet("/", async (
+            Guid subscriptionId,
+            ISender sender,
+            CancellationToken cancellationToken) =>
         {
-            var logs = store.GetAuditLogsBySubscription(subscriptionId).Select(AuditLogResponse.FromEntity);
-            return Results.Ok(logs);
+            var result = await sender.Send(
+                new GetSubscriptionAuditLogQuery(subscriptionId),
+                cancellationToken);
+
+            return result.IsFailure ? ToError(result) : Results.Ok(result.Value);
         })
         .WithName("GetSubscriptionAuditLog")
         .WithSummary("Consultar historial cronológico inmutable de novedades de una suscripción (Módulo Audit)")
-        .Produces<IEnumerable<AuditLogResponse>>(StatusCodes.Status200OK);
+        .Produces<IReadOnlyList<AuditLogResponse>>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status404NotFound);
 
-        // GET /api/v1/members/{memberId}/audit-log - Historial de novedades de un miembro
-        routes.MapGet("/api/v1/members/{memberId:guid}/audit-log", (Guid memberId, InMemoryCustomerStore store) =>
+        routes.MapGet("/api/v1/members/{memberId:guid}/audit-log", async (
+            Guid memberId,
+            ISender sender,
+            CancellationToken cancellationToken) =>
         {
-            var logs = store.GetAuditLogsByMember(memberId).Select(AuditLogResponse.FromEntity);
-            return Results.Ok(logs);
+            var result = await sender.Send(
+                new GetMemberAuditLogQuery(memberId),
+                cancellationToken);
+
+            return result.IsFailure ? ToError(result) : Results.Ok(result.Value);
         })
         .WithTags("Audit")
         .WithName("GetMemberAuditLog")
         .WithSummary("Consultar historial de movimientos y coberturas de un miembro por UUID (Módulo Audit)")
-        .Produces<IEnumerable<AuditLogResponse>>(StatusCodes.Status200OK);
+        .Produces<IReadOnlyList<AuditLogResponse>>(StatusCodes.Status200OK);
 
         return routes;
     }
+
+    private static IResult ToError(Result result) =>
+        Results.Json(new { message = result.ErrorMessage }, statusCode: result.StatusCode);
 }

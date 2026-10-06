@@ -1,4 +1,6 @@
+using FH.Modules.Audit.Domain.Repositories;
 using FH.Modules.Audit.Infrastructure.Endpoints;
+using FH.Modules.Audit.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,7 +11,7 @@ public static class AuditModuleExtensions
 {
     public static IServiceCollection AddAuditModule(this IServiceCollection services, IConfiguration? configuration = null)
     {
-        // Registro de servicios de bitácora y auditoría
+        services.AddScoped<IBeneficiaryAuditLogRepository, BeneficiaryAuditLogRepository>();
         return services;
     }
 
