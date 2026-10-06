@@ -38,6 +38,14 @@ builder.Services.AddSharedRepositories();
 builder.Services.AddSharedCqrs(
     typeof(BeneficiariesModuleExtensions).Assembly,
     typeof(CustomerModuleExtensions).Assembly);
+    typeof(CustomerPlansModuleExtensions).Assembly);
+
+// Soporte para Controllers
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
 
 // Configuración de serialización JSON con Enums legibles (ej: "Individual", "Human", "Child")
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
@@ -68,6 +76,41 @@ app.UseSwaggerUI(c =>
 
 app.UseHttpsRedirection();
 
+// Manejo centralizado de excepciones con ProblemDetails (RN-09, BusinessRule -> 422, Validation -> 400, NotFound -> 404)
+app.UseExceptionHandler(exceptionHandlerApp =>
+{
+    exceptionHandlerApp.Run(async context =>
+    {
+        var exceptionHandlerPathFeature = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>();
+        var ex = exceptionHandlerPathFeature?.Error;
+
+        var statusCode = ex switch
+        {
+            FH.Shared.Domain.Exceptions.BusinessRuleException => StatusCodes.Status422UnprocessableEntity,
+            FluentValidation.ValidationException => StatusCodes.Status400BadRequest,
+            KeyNotFoundException => StatusCodes.Status404NotFound,
+            _ => StatusCodes.Status500InternalServerError
+        };
+
+        var problemDetails = new Microsoft.AspNetCore.Mvc.ProblemDetails
+        {
+            Status = statusCode,
+            Title = ex switch
+            {
+                FH.Shared.Domain.Exceptions.BusinessRuleException => "Regla de Negocio Incumplida",
+                FluentValidation.ValidationException => "Error de Validación",
+                KeyNotFoundException => "Recurso No Encontrado",
+                _ => "Error Interno del Servidor"
+            },
+            Detail = ex?.Message
+        };
+
+        context.Response.StatusCode = statusCode;
+        context.Response.ContentType = "application/problem+json";
+        await context.Response.WriteAsJsonAsync(problemDetails);
+    });
+});
+
 // Redireccionar raíz a swagger
 app.MapGet("/", () => Results.Redirect("/swagger")).ExcludeFromDescription();
 
@@ -86,6 +129,7 @@ app.MapCustomerModuleEndpoints();
 app.MapCustomerPlansModuleEndpoints();
 app.MapBeneficiariesModuleEndpoints();
 app.MapAuditModuleEndpoints();
+app.MapControllers();
 
 app.Run();
 
