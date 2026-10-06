@@ -37,6 +37,7 @@ builder.Services.AddMessagingModule(builder.Configuration);
 builder.Services.AddSharedRepositories();
 builder.Services.AddSharedCqrs(
     typeof(BeneficiariesModuleExtensions).Assembly,
+    typeof(CustomerModuleExtensions).Assembly);
     typeof(CustomerPlansModuleExtensions).Assembly);
 
 // Soporte para Controllers
