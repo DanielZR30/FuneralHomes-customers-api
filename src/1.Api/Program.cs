@@ -37,15 +37,9 @@ builder.Services.AddMessagingModule(builder.Configuration);
 builder.Services.AddSharedRepositories();
 builder.Services.AddSharedCqrs(
     typeof(BeneficiariesModuleExtensions).Assembly,
-    typeof(CustomerModuleExtensions).Assembly);
-    typeof(CustomerPlansModuleExtensions).Assembly);
-
-// Soporte para Controllers
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
-    });
+    typeof(CustomerModuleExtensions).Assembly,
+    typeof(CustomerPlansModuleExtensions).Assembly,
+    typeof(AuditModuleExtensions).Assembly);
 
 // Configuración de serialización JSON con Enums legibles (ej: "Individual", "Human", "Child")
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
@@ -129,7 +123,6 @@ app.MapCustomerModuleEndpoints();
 app.MapCustomerPlansModuleEndpoints();
 app.MapBeneficiariesModuleEndpoints();
 app.MapAuditModuleEndpoints();
-app.MapControllers();
 
 app.Run();
 
