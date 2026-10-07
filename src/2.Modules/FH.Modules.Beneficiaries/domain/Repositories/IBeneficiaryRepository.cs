@@ -1,4 +1,4 @@
-﻿using FH.Shared.Domain.Entities;
+using FH.Modules.Beneficiaries.Domain.Entities;
 using FH.Shared.Domain.Enums;
 
 namespace FH.Modules.Beneficiaries.Domain.Repositories;

@@ -1,16 +1,16 @@
-﻿using FH.Modules.Beneficiaries.Domain.Repositories;
-using FH.Shared.Domain.Entities;
+using FH.Modules.Beneficiaries.Domain.Entities;
+using FH.Modules.Beneficiaries.Domain.Repositories;
+using FH.Modules.Beneficiaries.Infrastructure.Persistence;
 using FH.Shared.Domain.Enums;
-using FH.Shared.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace FH.Modules.Beneficiaries.Infrastructure.Repositories;
 
 public class BeneficiaryRepository : IBeneficiaryRepository
 {
-    private readonly CustomerDbContext _context;
+    private readonly BeneficiariesDbContext _context;
 
-    public BeneficiaryRepository(CustomerDbContext context)
+    public BeneficiaryRepository(BeneficiariesDbContext context)
     {
         _context = context;
     }

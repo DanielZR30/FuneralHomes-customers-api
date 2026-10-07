@@ -1,7 +1,9 @@
-﻿using FH.Modules.Beneficiaries.Application.DTOs;
+using FH.Modules.Beneficiaries.Application.DTOs;
 using FH.Modules.Beneficiaries.Domain.Repositories;
 using FH.Shared.Application.Common;
 using FH.Shared.Application.Cqrs;
+using BeneficiaryEntity = FH.Modules.Beneficiaries.Domain.Entities.Beneficiary;
+using MemberEntity = FH.Modules.Beneficiaries.Domain.Entities.Member;
 using FH.Shared.Domain.Entities;
 using FH.Shared.Domain.Enums;
 using FH.Shared.Domain.Exceptions;
@@ -51,12 +53,12 @@ public class AddBeneficiaryCommandHandler : ICommandHandler<AddBeneficiaryComman
                 $"Se ha alcanzado el cupo máximo de beneficiarios ({subscription.MaxBeneficiaries}) para esta suscripción. Activos: {activeCount}.");
         }
 
-        Member member;
-        Beneficiary beneficiary;
+        MemberEntity member;
+        BeneficiaryEntity beneficiary;
 
         try
         {
-            member = Member.Create(
+            member = MemberEntity.Create(
                 request.SubjectType,
                 request.FirstName,
                 request.BirthDate,
@@ -66,7 +68,7 @@ public class AddBeneficiaryCommandHandler : ICommandHandler<AddBeneficiaryComman
                 request.Email,
                 request.Phone);
 
-            beneficiary = Beneficiary.Enroll(
+            beneficiary = BeneficiaryEntity.Enroll(
                 request.SubscriptionId,
                 member,
                 request.BeneficiaryType,
