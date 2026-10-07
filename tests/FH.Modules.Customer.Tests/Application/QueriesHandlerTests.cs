@@ -4,7 +4,7 @@ using FH.Modules.Customer.Application.Queries.GetCustomers;
 using FH.Modules.Customer.Domain.Repositories;
 using FH.Shared.Domain.Enums;
 using Moq;
-using CustomerEntity = FH.Shared.Domain.Entities.Customer;
+using CustomerEntity = FH.Modules.Customer.Domain.Entities.Customer;
 
 namespace FH.Modules.Customer.Tests.Application;
 

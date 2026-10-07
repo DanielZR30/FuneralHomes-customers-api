@@ -1,4 +1,4 @@
-using FH.Shared.Domain.Entities;
+using CustomerEntity = FH.Modules.Customer.Domain.Entities.Customer;
 using FH.Shared.Domain.Enums;
 
 namespace FH.Modules.Customer.Application.DTOs;
@@ -32,7 +32,7 @@ public record CustomerResponse(
     string Status,
     DateTime CreatedAt)
 {
-    public static CustomerResponse FromEntity(FH.Shared.Domain.Entities.Customer customer) =>
+    public static CustomerResponse FromEntity(CustomerEntity customer) =>
         new(
             customer.Id,
             customer.CustomerType.ToString(),

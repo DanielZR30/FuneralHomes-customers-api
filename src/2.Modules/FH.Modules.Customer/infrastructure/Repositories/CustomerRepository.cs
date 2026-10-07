@@ -1,13 +1,14 @@
 using FH.Modules.Customer.Domain.Repositories;
 using FH.Shared.Infrastructure.Persistence.Repositories;
+using FH.Modules.Customer.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using CustomerEntity = FH.Shared.Domain.Entities.Customer;
+using CustomerEntity = FH.Modules.Customer.Domain.Entities.Customer;
 
 namespace FH.Modules.Customer.Infrastructure.Repositories;
 
 public class CustomerRepository : EfRepository<CustomerEntity, Guid>, ICustomerRepository
 {
-    public CustomerRepository(DbContext context) : base(context)
+    public CustomerRepository(CustomerModuleDbContext context) : base(context)
     {
     }
 

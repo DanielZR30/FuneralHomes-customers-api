@@ -1,5 +1,5 @@
 using FH.Shared.Domain.Repositories;
-using CustomerEntity = FH.Shared.Domain.Entities.Customer;
+using CustomerEntity = FH.Modules.Customer.Domain.Entities.Customer;
 
 namespace FH.Modules.Customer.Domain.Repositories;
 

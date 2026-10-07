@@ -5,7 +5,7 @@ using FH.Shared.Domain.Enums;
 using FH.Shared.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using CustomerEntity = FH.Shared.Domain.Entities.Customer;
+using CustomerEntity = FH.Modules.Customer.Domain.Entities.Customer;
 
 namespace FH.Modules.Customer.Tests.Application;
 

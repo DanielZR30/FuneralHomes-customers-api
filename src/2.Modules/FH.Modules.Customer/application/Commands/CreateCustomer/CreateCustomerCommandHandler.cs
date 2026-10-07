@@ -4,7 +4,7 @@ using FH.Shared.Application.Common;
 using FH.Shared.Application.Cqrs;
 using FH.Shared.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
-using CustomerEntity = FH.Shared.Domain.Entities.Customer;
+using CustomerEntity = FH.Modules.Customer.Domain.Entities.Customer;
 
 namespace FH.Modules.Customer.Application.Commands.CreateCustomer;
 
