@@ -28,6 +28,7 @@ public static class CustomerModuleExtensions
         // de este módulo se agrega en AddSharedCqrs (Program.cs).
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<FH.Modules.Customer.Application.Abstractions.ICustomerUnitOfWork, CustomerUnitOfWork>();
+        services.AddScoped<CustomerSeeder>();
 
         return services;
     }

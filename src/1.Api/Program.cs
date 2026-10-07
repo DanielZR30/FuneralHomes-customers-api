@@ -105,6 +105,42 @@ app.MapCustomerPlansModuleEndpoints();
 app.MapBeneficiariesModuleEndpoints();
 app.MapAuditModuleEndpoints();
 
+// Inicialización y Seeding de Base de Datos al arranque
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var logger = services.GetService<ILogger<Program>>();
+
+    try
+    {
+        // 1. Asegurar esquema en BD para cada módulo
+        var customerDb = services.GetService<FH.Modules.Customer.Infrastructure.Persistence.CustomerModuleDbContext>();
+        if (customerDb is not null) await customerDb.Database.EnsureCreatedAsync();
+
+        var plansDb = services.GetService<FH.Modules.CustomerPlans.Infrastructure.CustomerPlansDbContext>();
+        if (plansDb is not null) await plansDb.Database.EnsureCreatedAsync();
+
+        var beneficiariesDb = services.GetService<FH.Modules.Beneficiaries.Infrastructure.Persistence.BeneficiariesDbContext>();
+        if (beneficiariesDb is not null) await beneficiariesDb.Database.EnsureCreatedAsync();
+
+        var auditDb = services.GetService<FH.Modules.Audit.Infrastructure.Persistence.AuditDbContext>();
+        if (auditDb is not null) await auditDb.Database.EnsureCreatedAsync();
+
+        // 2. Sembrar datos de prueba
+        var customerSeeder = services.GetService<FH.Modules.Customer.Infrastructure.Persistence.CustomerSeeder>();
+        if (customerSeeder is not null) await customerSeeder.SeedAsync();
+
+        var plansSeeder = services.GetService<FH.Modules.CustomerPlans.Infrastructure.IDataSeeder>();
+        if (plansSeeder is not null) await plansSeeder.SeedAsync();
+
+        logger?.LogInformation("Inicialización y sembrado de datos completado exitosamente.");
+    }
+    catch (Exception ex)
+    {
+        logger?.LogWarning(ex, "No se pudo conectar a la base de datos para EnsureCreated/Seeders. Asegúrate de levantar PostgreSQL.");
+    }
+}
+
 app.Run();
 
 
