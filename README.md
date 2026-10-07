@@ -8,7 +8,7 @@ Es el único responsable de los clientes titulares, sus suscripciones a planes y
 * **Clientes titulares:** personas naturales (`INDIVIDUAL`) y empresas (`CORPORATE`), con documento, contacto y estado.
 * **Suscripciones:** afiliación a un plan y control del cupo máximo de beneficiarios (`max_beneficiaries`).
 * **Beneficiarios:** miembros humanos (`HUMAN`) y mascotas (`PET`), con la **edad derivada** calculada desde la fecha de nacimiento.
-* **Auditoría y eventos:** cada alta, cambio o retiro de un beneficiario queda registrado como evento de dominio; la publicación a Kafka para que Financials recalcule la cuota está pendiente.
+* **Auditoría y eventos:** cada alta, cambio o retiro de un beneficiario queda registrado como evento de dominio; (`InMemoryEventPublisher`, que registra en el log) ya está registrado como `IEventPublisher`; falta conectarlo a los eventos y a Kafka para que Financials recalcule la cuota.
 
 ---
 
@@ -25,7 +25,7 @@ src/
 │   └── FH.Customers.Application/       # Casos de uso (CQRS), mediador, validadores, DTOs, Result
 ├── Infrastructure/
 │   ├── FH.Customers.Persistence/       # EF Core: CustomerDbContext, configuraciones, repositorios, Unit of Work, migraciones
-│   └── FH.Customers.Infrastructure/    # Adaptadores externos (gateways) y datos de ejemplo
+│   └── FH.Customers.Infrastructure/    # Adaptadores externos (gateways) publicador de eventos en memoria y datos de ejemplo
 └── Presentation/
     └── FH.Customers.Api/               # Controllers REST, Program.cs, Swagger
 tests/

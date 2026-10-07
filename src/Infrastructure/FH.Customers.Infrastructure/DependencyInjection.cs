@@ -2,7 +2,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using FH.Customers.Application.CustomerPlans;
 using FH.Customers.Application.CustomerPlans.Abstractions;
+using FH.Customers.Application.Messaging;
 using FH.Customers.Infrastructure.CustomerPlans.Gateways;
+using FH.Customers.Infrastructure.Messaging;
 using FH.Customers.Infrastructure.MockData;
 
 namespace FH.Customers.Infrastructure;
@@ -11,7 +13,7 @@ public static class DependencyInjection
 {
     /// <summary>
     /// Registra la capa Infrastructure: adaptadores a sistemas externos (gateways), almacén mock
-    /// en memoria y, más adelante, el publicador de eventos (Kafka).
+    /// en memoria y el publicador de eventos (en memoria por ahora; Kafka pendiente).
     /// </summary>
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
@@ -25,7 +27,8 @@ public static class DependencyInjection
         services.AddScoped<IFinancialsPlanGateway, FinancialsPlanGatewayStub>();
         services.AddScoped<IAssignedBeneficiariesCounter, AssignedBeneficiariesCounterStub>();
 
-        // Mensajería (IEventPublisher + Kafka): pendiente de implementar
+        // Mensajería: publicador en memoria (registra en el log). Kafka se conecta cambiando esta línea.
+        services.AddScoped<IEventPublisher, InMemoryEventPublisher>();
 
         return services;
     }
