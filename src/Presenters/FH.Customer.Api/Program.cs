@@ -16,11 +16,12 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Funeral Homes Customers API v1");
+    c.RoutePrefix = "swagger";
+});
 
 // Seed the database with initial sample data
 await DataBaseSeeder.SeedAsync(app.Services);
@@ -28,6 +29,9 @@ await DataBaseSeeder.SeedAsync(app.Services);
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+// Redirigir la raíz ("/") a Swagger
+app.MapGet("/", () => Results.Redirect("/swagger")).ExcludeFromDescription();
 
 app.MapControllers();
 
