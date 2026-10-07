@@ -1,8 +1,8 @@
+using FH.Modules.Customer.Application.Abstractions;
 using FH.Modules.Customer.Application.DTOs;
 using FH.Modules.Customer.Domain.Repositories;
 using FH.Shared.Application.Common;
 using FH.Shared.Application.Cqrs;
-using FH.Shared.Domain.Repositories;
 
 namespace FH.Modules.Customer.Application.Commands.UpdateCustomerDemographics;
 
@@ -10,11 +10,11 @@ public class UpdateCustomerDemographicsCommandHandler
     : ICommandHandler<UpdateCustomerDemographicsCommand, CustomerResponse>
 {
     private readonly ICustomerRepository _customers;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly ICustomerUnitOfWork _unitOfWork;
 
     public UpdateCustomerDemographicsCommandHandler(
         ICustomerRepository customers,
-        IUnitOfWork unitOfWork)
+        ICustomerUnitOfWork unitOfWork)
     {
         _customers = customers;
         _unitOfWork = unitOfWork;

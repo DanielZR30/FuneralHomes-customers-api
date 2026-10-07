@@ -1,19 +1,19 @@
+using FH.Modules.Audit.Application.Abstractions;
+using FH.Modules.Audit.Domain.Entities;
 using FH.Modules.Audit.Domain.Repositories;
 using FH.Shared.Application.Common;
 using FH.Shared.Application.Cqrs;
-using FH.Modules.Audit.Domain.Entities;
-using FH.Shared.Domain.Repositories;
 
 namespace FH.Modules.Audit.Application.Commands.RecordAuditLog;
 
 public class RecordAuditLogCommandHandler : ICommandHandler<RecordAuditLogCommand>
 {
     private readonly IBeneficiaryAuditLogRepository _auditLogs;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IAuditUnitOfWork _unitOfWork;
 
     public RecordAuditLogCommandHandler(
         IBeneficiaryAuditLogRepository auditLogs,
-        IUnitOfWork unitOfWork)
+        IAuditUnitOfWork unitOfWork)
     {
         _auditLogs = auditLogs;
         _unitOfWork = unitOfWork;

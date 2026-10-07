@@ -1,8 +1,8 @@
+using FH.Modules.Customer.Application.Abstractions;
 using FH.Modules.Customer.Application.DTOs;
 using FH.Modules.Customer.Domain.Repositories;
 using FH.Shared.Application.Common;
 using FH.Shared.Application.Cqrs;
-using FH.Shared.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using CustomerEntity = FH.Modules.Customer.Domain.Entities.Customer;
 
@@ -11,11 +11,11 @@ namespace FH.Modules.Customer.Application.Commands.CreateCustomer;
 public class CreateCustomerCommandHandler : ICommandHandler<CreateCustomerCommand, CustomerResponse>
 {
     private readonly ICustomerRepository _customers;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly ICustomerUnitOfWork _unitOfWork;
 
     public CreateCustomerCommandHandler(
         ICustomerRepository customers,
-        IUnitOfWork unitOfWork)
+        ICustomerUnitOfWork unitOfWork)
     {
         _customers = customers;
         _unitOfWork = unitOfWork;

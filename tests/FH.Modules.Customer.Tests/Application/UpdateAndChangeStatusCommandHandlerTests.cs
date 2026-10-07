@@ -8,10 +8,12 @@ using CustomerEntity = FH.Modules.Customer.Domain.Entities.Customer;
 
 namespace FH.Modules.Customer.Tests.Application;
 
+using FH.Modules.Customer.Application.Abstractions;
+
 public class UpdateAndChangeStatusCommandHandlerTests
 {
     private readonly Mock<ICustomerRepository> _customersMock = new();
-    private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
+    private readonly Mock<ICustomerUnitOfWork> _unitOfWorkMock = new();
     private readonly UpdateCustomerDemographicsCommandHandler _updateHandler;
     private readonly ChangeCustomerStatusCommandHandler _statusHandler;
 

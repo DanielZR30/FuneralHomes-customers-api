@@ -26,6 +26,7 @@ public static class AuditModuleExtensions
 
         services.AddScoped<IBeneficiaryAuditLogRepository, BeneficiaryAuditLogRepository>();
         services.AddScoped<FH.Modules.Audit.Domain.Abstractions.ISubscriptionExistenceChecker, FH.Modules.Audit.Infrastructure.Gateways.SqlSubscriptionExistenceChecker>();
+        services.AddScoped<FH.Modules.Audit.Application.Abstractions.IAuditUnitOfWork, FH.Modules.Audit.Infrastructure.Persistence.AuditUnitOfWork>();
         return services;
     }
 

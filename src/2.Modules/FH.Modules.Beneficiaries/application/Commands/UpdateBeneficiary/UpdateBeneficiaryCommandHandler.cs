@@ -1,21 +1,21 @@
-﻿using FH.Modules.Beneficiaries.Application.DTOs;
+using FH.Modules.Beneficiaries.Application.Abstractions;
+using FH.Modules.Beneficiaries.Application.DTOs;
 using FH.Modules.Beneficiaries.Domain.Repositories;
 using FH.Shared.Application.Common;
 using FH.Shared.Application.Cqrs;
 using FH.Shared.Domain.Enums;
 using FH.Shared.Domain.Exceptions;
-using FH.Shared.Domain.Repositories;
 
 namespace FH.Modules.Beneficiaries.Application.Commands.UpdateBeneficiary;
 
 public class UpdateBeneficiaryCommandHandler : ICommandHandler<UpdateBeneficiaryCommand, BeneficiaryResponse>
 {
     private readonly IBeneficiaryRepository _beneficiaries;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IBeneficiariesUnitOfWork _unitOfWork;
 
     public UpdateBeneficiaryCommandHandler(
         IBeneficiaryRepository beneficiaries,
-        IUnitOfWork unitOfWork)
+        IBeneficiariesUnitOfWork unitOfWork)
     {
         _beneficiaries = beneficiaries;
         _unitOfWork = unitOfWork;

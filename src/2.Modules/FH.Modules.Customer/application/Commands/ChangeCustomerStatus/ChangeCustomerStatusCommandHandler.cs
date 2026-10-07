@@ -1,19 +1,19 @@
+using FH.Modules.Customer.Application.Abstractions;
 using FH.Modules.Customer.Domain.Repositories;
 using FH.Shared.Application.Common;
 using FH.Shared.Application.Cqrs;
 using FH.Shared.Domain.Enums;
-using FH.Shared.Domain.Repositories;
 
 namespace FH.Modules.Customer.Application.Commands.ChangeCustomerStatus;
 
 public class ChangeCustomerStatusCommandHandler : ICommandHandler<ChangeCustomerStatusCommand>
 {
     private readonly ICustomerRepository _customers;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly ICustomerUnitOfWork _unitOfWork;
 
     public ChangeCustomerStatusCommandHandler(
         ICustomerRepository customers,
-        IUnitOfWork unitOfWork)
+        ICustomerUnitOfWork unitOfWork)
     {
         _customers = customers;
         _unitOfWork = unitOfWork;

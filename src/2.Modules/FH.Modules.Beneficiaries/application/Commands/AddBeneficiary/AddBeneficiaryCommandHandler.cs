@@ -1,3 +1,4 @@
+using FH.Modules.Beneficiaries.Application.Abstractions;
 using FH.Modules.Beneficiaries.Application.DTOs;
 using FH.Modules.Beneficiaries.Domain.Abstractions;
 using FH.Modules.Beneficiaries.Domain.Repositories;
@@ -7,7 +8,6 @@ using BeneficiaryEntity = FH.Modules.Beneficiaries.Domain.Entities.Beneficiary;
 using MemberEntity = FH.Modules.Beneficiaries.Domain.Entities.Member;
 using FH.Shared.Domain.Enums;
 using FH.Shared.Domain.Exceptions;
-using FH.Shared.Domain.Repositories;
 
 namespace FH.Modules.Beneficiaries.Application.Commands.AddBeneficiary;
 
@@ -15,12 +15,12 @@ public class AddBeneficiaryCommandHandler : ICommandHandler<AddBeneficiaryComman
 {
     private readonly ISubscriptionChecker _subscriptionChecker;
     private readonly IBeneficiaryRepository _beneficiaries;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IBeneficiariesUnitOfWork _unitOfWork;
 
     public AddBeneficiaryCommandHandler(
         ISubscriptionChecker subscriptionChecker,
         IBeneficiaryRepository beneficiaries,
-        IUnitOfWork unitOfWork)
+        IBeneficiariesUnitOfWork unitOfWork)
     {
         _subscriptionChecker = subscriptionChecker;
         _beneficiaries = beneficiaries;

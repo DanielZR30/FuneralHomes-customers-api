@@ -15,8 +15,7 @@ builder.Services.AddBeneficiariesModule(builder.Configuration);
 builder.Services.AddAuditModule(builder.Configuration);
 builder.Services.AddMessagingModule(builder.Configuration);
 
-// Infraestructura compartida: Repository + Unit of Work y MediatR (CQRS)
-builder.Services.AddSharedRepositories();
+// Infraestructura compartida: MediatR (CQRS)
 builder.Services.AddSharedCqrs(
     typeof(BeneficiariesModuleExtensions).Assembly,
     typeof(CustomerModuleExtensions).Assembly,

@@ -27,6 +27,7 @@ public static class CustomerModuleExtensions
         // Los handlers de comandos y consultas se descubren por MediatR: el ensamblado
         // de este módulo se agrega en AddSharedCqrs (Program.cs).
         services.AddScoped<ICustomerRepository, CustomerRepository>();
+        services.AddScoped<FH.Modules.Customer.Application.Abstractions.ICustomerUnitOfWork, CustomerUnitOfWork>();
 
         return services;
     }

@@ -7,12 +7,14 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using CustomerEntity = FH.Modules.Customer.Domain.Entities.Customer;
 
+using FH.Modules.Customer.Application.Abstractions;
+
 namespace FH.Modules.Customer.Tests.Application;
 
 public class CreateCustomerCommandHandlerTests
 {
     private readonly Mock<ICustomerRepository> _customersMock = new();
-    private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
+    private readonly Mock<ICustomerUnitOfWork> _unitOfWorkMock = new();
     private readonly CreateCustomerCommandHandler _handler;
 
     public CreateCustomerCommandHandlerTests()
