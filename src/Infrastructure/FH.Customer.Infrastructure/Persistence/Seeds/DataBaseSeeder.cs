@@ -21,13 +21,9 @@ public static class DataBaseSeeder
             if (context is not null)
             {
                 var creator = context.Database.GetService<IRelationalDatabaseCreator>();
-                try
+                if (!await creator.HasTablesAsync())
                 {
                     await creator.CreateTablesAsync();
-                }
-                catch
-                {
-                    // Tablas ya creadas
                 }
             }
 
