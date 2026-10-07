@@ -1,5 +1,5 @@
 using FH.Modules.Audit.Domain.Repositories;
-using FH.Shared.Domain.Entities;
+using FH.Modules.Audit.Domain.Entities;
 using FH.Shared.Domain.Enums;
 using FH.Shared.Domain.Events;
 using MediatR;

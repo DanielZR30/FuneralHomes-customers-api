@@ -1,7 +1,9 @@
 using FH.Modules.Audit.Domain.Repositories;
 using FH.Modules.Audit.Infrastructure.Endpoints;
+using FH.Modules.Audit.Infrastructure.Persistence;
 using FH.Modules.Audit.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,6 +13,17 @@ public static class AuditModuleExtensions
 {
     public static IServiceCollection AddAuditModule(this IServiceCollection services, IConfiguration? configuration = null)
     {
+        var connectionString = configuration?.GetConnectionString("CustomerDb")
+            ?? "Host=localhost;Port=5432;Database=fh_db_customer;Username=postgres;Password=secret";
+
+        services.AddDbContext<AuditDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString, npgsqlOptions =>
+            {
+                npgsqlOptions.MigrationsAssembly(typeof(AuditDbContext).Assembly.FullName);
+            });
+        });
+
         services.AddScoped<IBeneficiaryAuditLogRepository, BeneficiaryAuditLogRepository>();
         return services;
     }

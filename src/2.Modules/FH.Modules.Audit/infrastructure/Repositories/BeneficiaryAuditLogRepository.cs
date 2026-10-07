@@ -1,15 +1,15 @@
+using FH.Modules.Audit.Domain.Entities;
 using FH.Modules.Audit.Domain.Repositories;
-using FH.Shared.Domain.Entities;
-using FH.Shared.Persistence;
+using FH.Modules.Audit.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace FH.Modules.Audit.Infrastructure.Repositories;
 
 public class BeneficiaryAuditLogRepository : IBeneficiaryAuditLogRepository
 {
-    private readonly CustomerDbContext _context;
+    private readonly AuditDbContext _context;
 
-    public BeneficiaryAuditLogRepository(CustomerDbContext context)
+    public BeneficiaryAuditLogRepository(AuditDbContext context)
     {
         _context = context;
     }

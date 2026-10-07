@@ -1,7 +1,7 @@
 using FH.Modules.Audit.Domain.Repositories;
 using FH.Shared.Application.Common;
 using FH.Shared.Application.Cqrs;
-using FH.Shared.Domain.Entities;
+using FH.Modules.Audit.Domain.Entities;
 using FH.Shared.Domain.Repositories;
 
 namespace FH.Modules.Audit.Application.Commands.RecordAuditLog;

@@ -1,4 +1,4 @@
-using FH.Shared.Domain.Entities;
+using FH.Modules.Audit.Domain.Entities;
 
 namespace FH.Modules.Audit.Domain.Repositories;
 
