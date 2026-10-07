@@ -1,23 +1,22 @@
-﻿using FH.Modules.Beneficiaries.Application.DTOs;
+using FH.Modules.Beneficiaries.Application.DTOs;
+using FH.Modules.Beneficiaries.Domain.Abstractions;
 using FH.Modules.Beneficiaries.Domain.Repositories;
 using FH.Shared.Application.Common;
 using FH.Shared.Application.Cqrs;
-using FH.Shared.Domain.Entities;
-using FH.Shared.Domain.Repositories;
 
 namespace FH.Modules.Beneficiaries.Application.Queries.GetBeneficiariesBySubscription;
 
 public class GetBeneficiariesBySubscriptionQueryHandler
     : IQueryHandler<GetBeneficiariesBySubscriptionQuery, IReadOnlyList<BeneficiaryResponse>>
 {
-    private readonly IRepository<CustomerSubscription, Guid> _subscriptions;
+    private readonly ISubscriptionChecker _subscriptionChecker;
     private readonly IBeneficiaryRepository _beneficiaries;
 
     public GetBeneficiariesBySubscriptionQueryHandler(
-        IRepository<CustomerSubscription, Guid> subscriptions,
+        ISubscriptionChecker subscriptionChecker,
         IBeneficiaryRepository beneficiaries)
     {
-        _subscriptions = subscriptions;
+        _subscriptionChecker = subscriptionChecker;
         _beneficiaries = beneficiaries;
     }
 
@@ -25,7 +24,7 @@ public class GetBeneficiariesBySubscriptionQueryHandler
         GetBeneficiariesBySubscriptionQuery request,
         CancellationToken cancellationToken)
     {
-        var subscription = await _subscriptions.GetByIdAsync(request.SubscriptionId, cancellationToken);
+        var subscription = await _subscriptionChecker.GetSubscriptionAsync(request.SubscriptionId, cancellationToken);
 
         if (subscription is null)
         {

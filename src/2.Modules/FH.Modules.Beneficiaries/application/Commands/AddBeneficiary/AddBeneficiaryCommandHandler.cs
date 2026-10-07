@@ -1,10 +1,10 @@
 using FH.Modules.Beneficiaries.Application.DTOs;
+using FH.Modules.Beneficiaries.Domain.Abstractions;
 using FH.Modules.Beneficiaries.Domain.Repositories;
 using FH.Shared.Application.Common;
 using FH.Shared.Application.Cqrs;
 using BeneficiaryEntity = FH.Modules.Beneficiaries.Domain.Entities.Beneficiary;
 using MemberEntity = FH.Modules.Beneficiaries.Domain.Entities.Member;
-using FH.Shared.Domain.Entities;
 using FH.Shared.Domain.Enums;
 using FH.Shared.Domain.Exceptions;
 using FH.Shared.Domain.Repositories;
@@ -13,16 +13,16 @@ namespace FH.Modules.Beneficiaries.Application.Commands.AddBeneficiary;
 
 public class AddBeneficiaryCommandHandler : ICommandHandler<AddBeneficiaryCommand, BeneficiaryResponse>
 {
-    private readonly IRepository<CustomerSubscription, Guid> _subscriptions;
+    private readonly ISubscriptionChecker _subscriptionChecker;
     private readonly IBeneficiaryRepository _beneficiaries;
     private readonly IUnitOfWork _unitOfWork;
 
     public AddBeneficiaryCommandHandler(
-        IRepository<CustomerSubscription, Guid> subscriptions,
+        ISubscriptionChecker subscriptionChecker,
         IBeneficiaryRepository beneficiaries,
         IUnitOfWork unitOfWork)
     {
-        _subscriptions = subscriptions;
+        _subscriptionChecker = subscriptionChecker;
         _beneficiaries = beneficiaries;
         _unitOfWork = unitOfWork;
     }
@@ -31,7 +31,7 @@ public class AddBeneficiaryCommandHandler : ICommandHandler<AddBeneficiaryComman
         AddBeneficiaryCommand request,
         CancellationToken cancellationToken)
     {
-        var subscription = await _subscriptions.GetByIdAsync(request.SubscriptionId, cancellationToken);
+        var subscription = await _subscriptionChecker.GetSubscriptionAsync(request.SubscriptionId, cancellationToken);
 
         if (subscription is null)
         {
@@ -39,10 +39,10 @@ public class AddBeneficiaryCommandHandler : ICommandHandler<AddBeneficiaryComman
                 $"La suscripción {request.SubscriptionId} no existe.");
         }
 
-        if (subscription.Status != SubscriptionStatus.Active)
+        if (!subscription.IsActive)
         {
             return Result<BeneficiaryResponse>.UnprocessableEntity(
-                $"La suscripción no está activa (Estado: {subscription.Status}).");
+                $"La suscripción no está activa.");
         }
 
         var activeCount = await _beneficiaries.CountActiveAsync(request.SubscriptionId, cancellationToken);

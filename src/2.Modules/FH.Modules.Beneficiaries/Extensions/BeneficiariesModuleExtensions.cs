@@ -25,6 +25,7 @@ public static class BeneficiariesModuleExtensions
         });
 
         services.AddScoped<IBeneficiaryRepository, BeneficiaryRepository>();
+        services.AddScoped<FH.Modules.Beneficiaries.Domain.Abstractions.ISubscriptionChecker, FH.Modules.Beneficiaries.Infrastructure.Gateways.SqlSubscriptionChecker>();
         return services;
     }
 

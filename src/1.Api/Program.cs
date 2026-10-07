@@ -3,28 +3,10 @@ using FH.Modules.Beneficiaries.Extensions;
 using FH.Modules.Customer.Extensions;
 using FH.Modules.CustomerPlans.Extensions;
 using FH.Modules.Messaging.Extensions;
-using FH.Shared.MockData;
-using FH.Shared.Persistence;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi;
 using FH.Shared.Extensions;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Configuración de Base de Datos EF Core (fh.db.customer con PostgreSQL para migraciones)
-var connectionString = builder.Configuration.GetConnectionString("CustomerDb")
-    ?? "Host=localhost;Port=5432;Database=fh_db_customer;Username=postgres;Password=secret";
-
-builder.Services.AddDbContext<CustomerDbContext>(options =>
-{
-    options.UseNpgsql(connectionString, npgsqlOptions =>
-    {
-        npgsqlOptions.MigrationsAssembly("FH.Shared");
-    });
-});
-
-// Almacén Mock en memoria (permite probar la API y Swagger sin requerir PostgreSQL levantado)
-builder.Services.AddSingleton<InMemoryCustomerStore>();
 
 // 1. REGISTRO DE MÓDULOS DE LA APLICACIÓN
 builder.Services.AddCustomerModule(builder.Configuration);

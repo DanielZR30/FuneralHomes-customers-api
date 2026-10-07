@@ -1,23 +1,22 @@
 using FH.Modules.Audit.Application.DTOs;
+using FH.Modules.Audit.Domain.Abstractions;
 using FH.Modules.Audit.Domain.Repositories;
 using FH.Shared.Application.Common;
 using FH.Shared.Application.Cqrs;
-using FH.Shared.Domain.Entities;
-using FH.Shared.Domain.Repositories;
 
 namespace FH.Modules.Audit.Application.Queries.GetSubscriptionAuditLog;
 
 public class GetSubscriptionAuditLogQueryHandler
     : IQueryHandler<GetSubscriptionAuditLogQuery, IReadOnlyList<AuditLogResponse>>
 {
-    private readonly IRepository<CustomerSubscription, Guid> _subscriptions;
+    private readonly ISubscriptionExistenceChecker _subscriptionChecker;
     private readonly IBeneficiaryAuditLogRepository _auditLogs;
 
     public GetSubscriptionAuditLogQueryHandler(
-        IRepository<CustomerSubscription, Guid> subscriptions,
+        ISubscriptionExistenceChecker subscriptionChecker,
         IBeneficiaryAuditLogRepository auditLogs)
     {
-        _subscriptions = subscriptions;
+        _subscriptionChecker = subscriptionChecker;
         _auditLogs = auditLogs;
     }
 
@@ -25,9 +24,9 @@ public class GetSubscriptionAuditLogQueryHandler
         GetSubscriptionAuditLogQuery request,
         CancellationToken cancellationToken)
     {
-        var subscription = await _subscriptions.GetByIdAsync(request.SubscriptionId, cancellationToken);
+        var exists = await _subscriptionChecker.ExistsAsync(request.SubscriptionId, cancellationToken);
 
-        if (subscription is null)
+        if (!exists)
         {
             return Result<IReadOnlyList<AuditLogResponse>>.NotFound(
                 $"La suscripción {request.SubscriptionId} no existe.");

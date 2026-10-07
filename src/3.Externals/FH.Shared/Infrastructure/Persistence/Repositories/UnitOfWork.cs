@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using FH.Shared.Domain.Common;
 using FH.Shared.Domain.Repositories;
-using FH.Shared.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -13,13 +12,13 @@ namespace FH.Shared.Infrastructure.Persistence.Repositories;
 /// </summary>
 public class UnitOfWork : IUnitOfWork
 {
-    private readonly CustomerDbContext _context;
+    private readonly DbContext _context;
     private readonly IPublisher? _publisher;
     private readonly ConcurrentDictionary<Type, object> _repositories = new();
     private IDbContextTransaction? _currentTransaction;
     private bool _disposed;
 
-    public UnitOfWork(CustomerDbContext context, IPublisher? publisher = null)
+    public UnitOfWork(DbContext context, IPublisher? publisher = null)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _publisher = publisher;

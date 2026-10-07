@@ -20,9 +20,6 @@ public static class SharedServiceCollectionExtensions
         services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-        // Registra DbContext base mapeado a CustomerDbContext si es necesario
-        services.AddScoped<DbContext>(sp => sp.GetRequiredService<Persistence.CustomerDbContext>());
-
         return services;
     }
 
