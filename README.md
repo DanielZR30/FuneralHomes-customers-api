@@ -16,45 +16,47 @@ El microservicio de **Customers** (`fh.api.customer` y `fh.db.customer`) es el �
 
 ---
 
-## Arquitectura de Módulos (DDD)
+## Arquitectura del Microservicio (Clean Architecture & Clean Code)
 
-El microservicio está estructurado internamente en **5 Módulos Bounded**, cada uno aislado con su propia separación DDD (`domain`, `application`, `infrastructure`, `api`):
+El microservicio está estructurado en un único proyecto ejecutable (`src/FH.Customer.Api`), organizado internamente bajo los principios de **Clean Architecture** y **Clean Code**:
 
 ```text
 src/
-├── modules/
-│   ├── customer/                   # Módulo 1: Gestión de Titulares / Cuentas
-│   │   ├── domain/                 # Entidad Customer, Reglas de Titularidad (B2C/B2B)
-│   │   ├── application/            # Casos de uso: CreateCustomer, UpdateCustomerDemographics
-│   │   ├── infrastructure/         # Repositorio JPA/SQL (fh.db.customer)
-│   │   └── api/                    # Controladores REST para Titulares
-│   │
-│   ├── customer-plans/             # Módulo 2: Suscripción y Cupos
-│   │   ├── domain/                 # Entidad Subscription, Control de Cupo (max_beneficiaries)
-│   │   ├── application/            # Casos de uso: SubscribeCustomer, CancelSubscription
-│   │   ├── infrastructure/         # Repositorio de Suscripciones
-│   │   └── api/                    # Controladores REST de Suscripciones
-│   │
-│   ├── beneficiaries/              # Módulo 3: Sujetos Cubiertos (Personas/Mascotas)
-│   │   ├── domain/                 # Entidad Member, Agregado Beneficiary, Edad Derivada
-│   │   ├── application/            # Casos de uso: AddBeneficiary, RemoveBeneficiary
-│   │   ├── infrastructure/         # Repositorio de Miembros y Beneficiarios
-│   │   └── api/                    # Controladores REST de Beneficiarios
-│   │
-│   ├── audit/                      # Módulo 4: Auditoría e Historial de Novedades
-│   │   ├── domain/                 # Entidad AuditLog, Reglas de Trazabilidad
-│   │   ├── application/            # Casos de uso: GetSubscriptionHistory, RecordAudit
-│   │   ├── infrastructure/         # Persistencia de Logs de Auditoría
-│   │   └── api/                    # Consulta de Historial
-│   │
-│   ├── messaging/                  # Módulo 5 (FALTANTE): Integraciones y Eventos
-│   │   ├── domain/                 # Definición de Eventos de Dominio (BeneficiaryAddedEvent)
-│   │   ├── application/            # Manejadores de Eventos (Event Handlers)
-│   │   └── infrastructure/         # Productor de Apache Kafka, Cliente Auth (fh.api.identity)
-│   │
-│   └── shared/                     # Kernel Compartido
-│       ├── domain/                 # Value Objects: DocumentId, Address, ContactInfo
-│       └── infrastructure/         # Configuración de BD, Middlewares de Seguridad
+└── FH.Customer.Api/                    # Microservicio Completo (Un solo proyecto .csproj)
+    ├── Domain/                         # Capa de Dominio (Entidades, Value Objects, Reglas)
+    │   ├── Common/                     # BaseEntity, AggregateRoot, ValueObject
+    │   ├── Entities/                   # Customer, Subscription, Member, Beneficiary, BeneficiaryAuditLog
+    │   ├── Enums/                      # CustomerStatus, BeneficiaryType, etc.
+    │   ├── Events/                     # Domain Events
+    │   └── Repositories/               # Interfaces de Repositorios y Unit of Work
+    │
+    ├── Application/                    # Capa de Aplicación (CQRS con MediatR)
+    │   ├── Customers/                  # Commands, Queries y DTOs de Clientes
+    │   ├── Subscriptions/              # Commands, Queries y DTOs de Suscripciones
+    │   ├── Beneficiaries/              # Commands, Queries y DTOs de Beneficiarios
+    │   ├── Audit/                      # Queries y DTOs de Auditoría
+    │   └── Common/                     # Pipeline Behaviors (Logging, Result<T>)
+    │
+    ├── Infrastructure/                 # Capa de Infraestructura (Persistencia y Adaptadores)
+    │   ├── Persistence/                # CustomerDbContext (EF Core único) y Configuraciones
+    │   ├── Repositories/               # Implementaciones de Repositorios y Unit of Work
+    │   ├── Gateways/                   # Adaptadores externos y stubs
+    │   └── MockData/                   # Almacén en memoria para pruebas
+    │
+    ├── Endpoints/                      # Capa de Presentación (Minimal APIs)
+    │   ├── CustomerEndpoints.cs
+    │   ├── SubscriptionEndpoints.cs
+    │   ├── BeneficiaryEndpoints.cs
+    │   └── AuditEndpoints.cs
+    │
+    ├── Extensions/                     # Extensiones de Inyección de Dependencias
+    ├── Program.cs                      # Entrypoint limpio del host ASP.NET Core
+    └── appsettings.json
+
+tests/
+└── FH.Customer.Api.Tests/              # Proyecto Único de Pruebas Unitarias (73 tests)
+    ├── Customers/                      # Pruebas de Dominio y Aplicación de Clientes
+    └── Subscriptions/                  # Pruebas de Dominio y Aplicación de Suscripciones
 ```
 
 ---
