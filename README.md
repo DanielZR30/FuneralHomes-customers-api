@@ -1,67 +1,85 @@
-# Funeral Homes Platform - Microservicio de Customers (`fh.api.customer`)
+# Funeral Homes · Microservicio Customers (`fh.api.customer`)
 
-Este repositorio contiene la implementación del microservicio de **Customers** para la plataforma **Funeral Homes Project**, diseñado siguiendo principios de **Domain-Driven Design (DDD)**, arquitectura en capas/módulos y comunicación orientada a eventos (*Event-Driven Architecture*) [1, 2, 4].
+Microservicio de **Customers** de la plataforma Funeral Homes, hecho en **.NET 10** con **Clean Architecture**, **DDD** y **CQRS**.
+Es el único responsable de los clientes titulares, sus suscripciones a planes y las personas y mascotas cubiertas (beneficiarios).
 
----
+## Responsabilidades
 
-## Propósito del Microservicio
-
-El microservicio de **Customers** (`fh.api.customer` y `fh.db.customer`) es el único responsable de la administración demográfica, relacional y de jerarquía de los clientes y beneficiarios cubiertos por los planes funerarios [5, 6, 7].
-
-### Responsabilidades Clave
-* **Gestión de Cuentas / Titulares**: Clientes persona natural (B2C) o empresas (B2B) [6].
-* **Control de Suscripciones**: Registro liviano de la afiliación al plan y control del cupo máximo (`max_beneficiaries`).
-* **Sujetos Cubiertos**: Administración de miembros humanos (`HUMAN`) y mascotas (`PET`), calculando la **edad derivada** a partir de la fecha de nacimiento [5].
-* **Auditoría y Eventos**: Registro de novedades y publicación asíncrona en **Apache Kafka** para el cálculo de cuotas en **Financials** [2, 7, 8].
+* **Clientes titulares:** personas naturales (`INDIVIDUAL`) y empresas (`CORPORATE`), con documento, contacto y estado.
+* **Suscripciones:** afiliación a un plan y control del cupo máximo de beneficiarios (`max_beneficiaries`).
+* **Beneficiarios:** miembros humanos (`HUMAN`) y mascotas (`PET`), con la **edad derivada** calculada desde la fecha de nacimiento.
+* **Auditoría y eventos:** cada alta, cambio o retiro de un beneficiario queda registrado como evento de dominio; la publicación a Kafka para que Financials recalcule la cuota está pendiente.
 
 ---
 
-## Arquitectura de Módulos (DDD)
+## Arquitectura
 
-El microservicio está estructurado internamente en **5 Módulos Bounded**, cada uno aislado con su propia separación DDD (`domain`, `application`, `infrastructure`, `api`):
+Una sola Clean Architecture para todo el microservicio. Las capas son **proyectos** y los módulos
+(Customers, CustomerPlans, Beneficiaries, Audit, Messaging) son **carpetas** dentro de cada capa.
+Los namespaces siguen la convención proyecto + carpeta (por ejemplo `FH.Customers.Application.Beneficiaries.Commands.AddBeneficiary`).
 
 ```text
 src/
-├── modules/
-│   ├── customer/                   # Módulo 1: Gestión de Titulares / Cuentas
-│   │   ├── domain/                 # Entidad Customer, Reglas de Titularidad (B2C/B2B)
-│   │   ├── application/            # Casos de uso: CreateCustomer, UpdateCustomerDemographics
-│   │   ├── infrastructure/         # Repositorio JPA/SQL (fh.db.customer)
-│   │   └── api/                    # Controladores REST para Titulares
-│   │
-│   ├── customer-plans/             # Módulo 2: Suscripción y Cupos
-│   │   ├── domain/                 # Entidad Subscription, Control de Cupo (max_beneficiaries)
-│   │   ├── application/            # Casos de uso: SubscribeCustomer, CancelSubscription
-│   │   ├── infrastructure/         # Repositorio de Suscripciones
-│   │   └── api/                    # Controladores REST de Suscripciones
-│   │
-│   ├── beneficiaries/              # Módulo 3: Sujetos Cubiertos (Personas/Mascotas)
-│   │   ├── domain/                 # Entidad Member, Agregado Beneficiary, Edad Derivada
-│   │   ├── application/            # Casos de uso: AddBeneficiary, RemoveBeneficiary
-│   │   ├── infrastructure/         # Repositorio de Miembros y Beneficiarios
-│   │   └── api/                    # Controladores REST de Beneficiarios
-│   │
-│   ├── audit/                      # Módulo 4: Auditoría e Historial de Novedades
-│   │   ├── domain/                 # Entidad AuditLog, Reglas de Trazabilidad
-│   │   ├── application/            # Casos de uso: GetSubscriptionHistory, RecordAudit
-│   │   ├── infrastructure/         # Persistencia de Logs de Auditoría
-│   │   └── api/                    # Consulta de Historial
-│   │
-│   ├── messaging/                  # Módulo 5 (FALTANTE): Integraciones y Eventos
-│   │   ├── domain/                 # Definición de Eventos de Dominio (BeneficiaryAddedEvent)
-│   │   ├── application/            # Manejadores de Eventos (Event Handlers)
-│   │   └── infrastructure/         # Productor de Apache Kafka, Cliente Auth (fh.api.identity)
-│   │
-│   └── shared/                     # Kernel Compartido
-│       ├── domain/                 # Value Objects: DocumentId, Address, ContactInfo
-│       └── infrastructure/         # Configuración de BD, Middlewares de Seguridad
+├── Core/
+│   ├── FH.Customers.Domain/            # Entidades, value objects, eventos, excepciones, interfaces de repositorio
+│   └── FH.Customers.Application/       # Casos de uso (CQRS), mediador, validadores, DTOs, Result
+├── Infrastructure/
+│   ├── FH.Customers.Persistence/       # EF Core: CustomerDbContext, configuraciones, repositorios, Unit of Work, migraciones
+│   └── FH.Customers.Infrastructure/    # Adaptadores externos (gateways) y datos de ejemplo
+└── Presentation/
+    └── FH.Customers.Api/               # Controllers REST, Program.cs, Swagger
+tests/
+├── FH.Customers.Tests/                 # Dominio, validadores, mediador y handlers
+└── FH.CustomerPlans.Tests/             # Suscripciones
+scripts/                                # smoke-test.ps1, reset-db.ps1
+docs/                                   # ENDPOINTS.md y documentación por módulo
 ```
+
+Dependencias (de afuera hacia adentro): `Api → Application, Persistence, Infrastructure`; `Persistence/Infrastructure → Application → Domain`.
+`Domain` no depende de nada.
+
+### Patrones aplicados
+
+| Patrón | Dónde |
+|---|---|
+| **CQRS** | `Application/<Módulo>/Commands` y `Queries`: cada caso de uso tiene Command/Query, Handler y Validator |
+| **Mediator propio** | `Application/Mediator`: `IMediator`, `SimpleMediator`, `IRequest`, `IRequestHandler`; resuelve el Handler por reflexión y ejecuta los validadores antes |
+| **FluentValidation** | Un `Validator` por caso de uso, ejecutado por el mediador (devuelve 400 sin llegar al Handler) |
+| **Value Objects** | `DocumentId`, `ContactInfo`, `Address` (Customer y Member) y `MaxBeneficiaries`, `SubscriptionPeriod` (Subscription) |
+| **Repository** | Interfaces en `Domain/<Módulo>/Repositories`, implementación EF Core en `Persistence` |
+| **Unit of Work** | `IUnitOfWork` (`CommitAsync`/`RollbackAsync`) en Application; implementación única en Persistence |
+| **Eventos de dominio** | Las entidades generan eventos; `DomainEventDispatcher` los entrega a sus manejadores (auditoría) antes de guardar |
+| **Result** | Los Handlers devuelven `Result`/`Result<T>` con código HTTP; el controller lo traduce a la respuesta |
+
+---
+
+## Requisitos y ejecución local
+
+Requisitos: **.NET 10 SDK**, **Docker** (para PostgreSQL) y la herramienta `dotnet ef` (`dotnet tool install --global dotnet-ef`).
+
+```powershell
+# 1. PostgreSQL
+docker run --name fh-pg -e POSTGRES_PASSWORD=secret -p 5432:5432 -d postgres:16
+
+# 2. Crear la base y las tablas (desde la raíz del repositorio)
+.\scripts\reset-db.ps1
+
+# 3. Ejecutar la API (abre Swagger en https://localhost:7035/swagger)
+dotnet run --project src/Presentation/FH.Customers.Api --launch-profile https
+
+# 4. Pruebas unitarias y prueba de todos los endpoints (con la API corriendo)
+dotnet test
+.\scripts\smoke-test.ps1
+```
+
+La cadena de conexión está en `src/Presentation/FH.Customers.Api/appsettings.json` (`ConnectionStrings:CustomerDb`).
+Si PowerShell bloquea los scripts: `Set-ExecutionPolicy -Scope Process Bypass`.
 
 ---
 
 ## Esquema de Base de Datos (`fh.db.customer`)
 
-El microservicio utiliza una base de datos relacional dedicada [4, 7]:
+El microservicio utiliza una base de datos relacional dedicada:
 
 ```sql
 -- 1. Tabla de Clientes Titulares / Cuentas
@@ -70,12 +88,13 @@ CREATE TABLE customers (
     customer_type VARCHAR(20) NOT NULL CHECK (customer_type IN ('INDIVIDUAL', 'CORPORATE')),
     name VARCHAR(255) NOT NULL,
     identification_type VARCHAR(20) NOT NULL,
-    identification_number VARCHAR(50) NOT NULL UNIQUE,
+    identification_number VARCHAR(50) NOT NULL,
     email VARCHAR(100),
     phone VARCHAR(30),
     address VARCHAR(255),
     status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (identification_type, identification_number)
 );
 
 -- 2. Tabla de Suscripciones
@@ -130,7 +149,7 @@ CREATE TABLE beneficiary_audit_log (
 
 ## Eventos de Dominio (Apache Kafka)
 
-Este microservicio emite eventos asíncronos cuando ocurren cambios en los beneficiarios [2, 8]:
+Este microservicio emite eventos asíncronos cuando ocurren cambios en los beneficiarios:
 
 ### Evento: `customer.beneficiary.added`
 ```json
@@ -149,57 +168,29 @@ Este microservicio emite eventos asíncronos cuando ocurren cambios en los benef
 }
 ```
 * **Consumidores principales**:
-  * **Financials (`fh.api.financial`)**: Recalcula el costo de la cuota periódica del plan [7, 8].
-  * **Notifications (`fh.api.notification`)**: Genera la alerta/correo de confirmación al titular [11, 12].
+  * **Financials (`fh.api.financial`)**: Recalcula el costo de la cuota periódica del plan.
+  * **Notifications (`fh.api.notification`)**: Genera la alerta/correo de confirmación al titular.
 
 ---
 
-## Endpoints REST Principales (`fh.api.customer`)
-
-### Módulo `customer`
-* `POST /api/v1/customers` -> Crear cliente (Persona natural / Empresa)
-* `GET /api/v1/customers/{id}` -> Consultar ficha del cliente
-* `PUT /api/v1/customers/{id}` -> Actualizar datos demográficos/contacto
-
-### Módulo `customer-plans`
-* `POST /api/v1/subscriptions` -> Crear suscripción a un plan
-* `GET /api/v1/customers/{customerId}/subscriptions` -> Consultar suscripciones del cliente
-
-### Módulo `beneficiaries`
-* `POST /api/v1/subscriptions/{subscriptionId}/beneficiaries` -> Agregar beneficiario (humano/mascota)
-* `GET /api/v1/subscriptions/{subscriptionId}/beneficiaries` -> Listar grupo cubierto
-* `DELETE /api/v1/subscriptions/{subscriptionId}/beneficiaries/{memberId}` -> Retirar beneficiario
-
-### Módulo `audit`
-* `GET /api/v1/subscriptions/{subscriptionId}/audit-log` -> Consultar historial de novedades
-
 ---
 
-## Requisitos e Instalación
+## Endpoints
 
-1. **Prerrequisitos**:
-   * Docker & Docker Compose
-   * Database: PostgreSQL / MySQL (`fh.db.customer`)
-   * Message Broker: Apache Kafka
-2. **Variables de Entorno (`.env`)**:
-   ```env
-   PORT=8080
-   DB_HOST=localhost
-   DB_PORT=5432
-   DB_NAME=fh_db_customer
-   DB_USER=postgres
-   DB_PASS=secret
-   KAFKA_BROKERS=localhost:9092
-   IDENTITY_SERVICE_URL=http://localhost:8081
-   ```
-3. **Ejecución Local**:
-   ```bash
-   # Clonar e instalar dependencias
-   npm install # o dotnet restore / ./gradlew build
-   
-   # Iniciar base de datos y Kafka
-   docker-compose up -d
-   
-   # Iniciar el microservicio
-   npm run start:dev
-   ```
+Todos los endpoints, con sus cuerpos de ejemplo y códigos de respuesta, están en [`docs/ENDPOINTS.md`](docs/ENDPOINTS.md).
+
+| Módulo | Ruta base |
+|---|---|
+| Customers | `/api/v1/customers` |
+| Subscriptions | `/api/v1/subscriptions` |
+| Beneficiaries | `/api/v1/subscriptions/{subscriptionId}/beneficiaries` |
+| Audit | `/api/v1/subscriptions/{id}/audit-log` · `/api/v1/members/{id}/audit-log` |
+
+## Pruebas
+
+* **Unitarias** (xUnit + Moq): entidades y value objects, validadores, mediador, Handlers de Customers, Subscriptions, Beneficiaries y Auditoría.
+* **De extremo a extremo:** `scripts/smoke-test.ps1` ejecuta todos los endpoints contra la API real y verifica el código de cada caso.
+
+## Documentación por módulo
+
+Detalle de reglas de negocio y diseño de cada módulo en [`docs/modules`](docs/modules/README.md).

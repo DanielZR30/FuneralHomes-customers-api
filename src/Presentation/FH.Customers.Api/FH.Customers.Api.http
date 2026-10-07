@@ -1,0 +1,227 @@
+@host = https://localhost:7035
+@baseUrl = {{host}}/api/v1
+
+### ============================================================
+### Módulo 1 - Customer (fh.api.customer)
+### Colección de endpoints, peticiones exitosas y errores de dominio.
+### Variables de entorno: FH_API_BASE_URL y FH_API_TOKEN
+### ============================================================
+
+@customerId = 00000000-0000-0000-0000-000000000000
+@identificationType = CC
+@identificationNumber = 1010101010
+
+### ------------------------------------------------------------
+### SALUD
+### ------------------------------------------------------------
+
+### 1.1 Endpoint de salud del microservicio
+GET {{host}}/health
+Accept: application/json
+
+### ------------------------------------------------------------
+### POST /api/v1/customers  (HU-CUS-01 / HU-CUS-02)
+### ------------------------------------------------------------
+
+### 2.1 Registrar cliente persona natural (B2C) - 201 Created
+# @name createIndividualCustomer
+POST {{baseUrl}}/customers
+Content-Type: application/json
+
+{
+  "customerType": "Individual",
+  "name": "Ana María Gómez",
+  "identificationType": "CC",
+  "identificationNumber": "1010101010",
+  "email": "ana.gomez@correo.com",
+  "phone": "3001234567",
+  "address": "Calle 100 #20-30, Bogotá"
+}
+
+### 2.2 Registrar cliente corporativo (B2B) - 201 Created
+POST {{baseUrl}}/customers
+Content-Type: application/json
+
+{
+  "customerType": "Corporate",
+  "name": "Funeraria Del Norte Ltda",
+  "identificationType": "NIT",
+  "identificationNumber": "900123456",
+  "email": "contacto@funerarianorte.com",
+  "phone": "6015554444",
+  "address": "Av. Reina #45-10, Bogotá"
+}
+
+### 2.3 ERROR 409 - La pareja (tipo, número) de identificación ya existe  [RN-03]
+# Ejecutar de nuevo la petición 2.1 con el mismo CC y número.
+POST {{baseUrl}}/customers
+Content-Type: application/json
+
+{
+  "customerType": "Individual",
+  "name": "Ana Gómez Duplicada",
+  "identificationType": "CC",
+  "identificationNumber": "1010101010"
+}
+
+### 2.4 ERROR 400 - Nombre del titular vacío  [RN-01]
+POST {{baseUrl}}/customers
+Content-Type: application/json
+
+{
+  "customerType": "Individual",
+  "name": "   ",
+  "identificationType": "CC",
+  "identificationNumber": "2020202020"
+}
+
+### 2.5 ERROR 400 - Falta el tipo de identificación  [RN-02]
+POST {{baseUrl}}/customers
+Content-Type: application/json
+
+{
+  "customerType": "Individual",
+  "name": "Carlos Ramírez",
+  "identificationType": "",
+  "identificationNumber": "3030303030"
+}
+
+### 2.6 ERROR 400 - Falta el número de identificación  [RN-02]
+POST {{baseUrl}}/customers
+Content-Type: application/json
+
+{
+  "customerType": "Individual",
+  "name": "Carlos Ramírez",
+  "identificationType": "CC",
+  "identificationNumber": "   "
+}
+
+### ------------------------------------------------------------
+### GET /api/v1/customers  (listado con filtro opcional)
+### ------------------------------------------------------------
+
+### 3.1 Listar todos los clientes
+GET {{baseUrl}}/customers
+Accept: application/json
+
+### 3.2 Listar solo los clientes suspendidos
+GET {{baseUrl}}/customers?status=Suspended
+Accept: application/json
+
+### ------------------------------------------------------------
+### GET /api/v1/customers/by-identification  (HU-CUS-03)
+### ------------------------------------------------------------
+
+### 4.1 Consultar cliente por documento - 200 OK
+GET {{baseUrl}}/customers/by-identification?type=CC&number=1010101010
+Accept: application/json
+
+### 4.2 La consulta normaliza el documento: sirve en minúsculas y con espacios
+GET {{baseUrl}}/customers/by-identification?type=cc&number=%20%201010101010
+Accept: application/json
+
+### 4.3 ERROR 400 - Falta el parámetro number  [RN-08]
+GET {{baseUrl}}/customers/by-identification?type=CC
+Accept: application/json
+
+### 4.4 ERROR 404 - Documento no registrado
+GET {{baseUrl}}/customers/by-identification?type=CC&number=9999999999
+Accept: application/json
+
+### ------------------------------------------------------------
+### GET /api/v1/customers/{id}  (HU-CUS-03)
+### ------------------------------------------------------------
+
+### 5.1 Consultar ficha por UUID - 200 OK
+# Copiar el id devuelto por la petición 2.1
+GET {{baseUrl}}/customers/{{customerId}}
+Accept: application/json
+
+### 5.2 ERROR 404 - UUID inexistente
+GET {{baseUrl}}/customers/11111111-2222-3333-4444-555555555555
+Accept: application/json
+
+### ------------------------------------------------------------
+### PUT /api/v1/customers/{id}  (HU-CUS-04)
+### ------------------------------------------------------------
+
+### 6.1 Actualizar datos de contacto y dirección - 200 OK
+# La identificación NO se envía: es inmutable por diseño  [RN-05]
+PUT {{baseUrl}}/customers/{{customerId}}
+Content-Type: application/json
+
+{
+  "name": "Ana María Gómez de la Torre",
+  "email": "anamaria.gomez@correo.com",
+  "phone": "3019876543",
+  "address": "Cra. 70 #5-20, Bogotá"
+}
+
+### 6.2 ERROR 400 - Nombre vacío en la actualización  [RN-04]
+PUT {{baseUrl}}/customers/{{customerId}}
+Content-Type: application/json
+
+{
+  "name": "  "
+}
+
+### 6.3 ERROR 404 - UUID inexistente
+PUT {{baseUrl}}/customers/11111111-2222-3333-4444-555555555555
+Content-Type: application/json
+
+{
+  "name": "Ana María Gómez"
+}
+
+### ------------------------------------------------------------
+### PATCH /api/v1/customers/{id}/status  (HU-CUS-05)
+### ------------------------------------------------------------
+
+### 7.1 Suspender al titular - 204 No Content
+PATCH {{baseUrl}}/customers/{{customerId}}/status
+Content-Type: application/json
+
+{
+  "status": "Suspended"
+}
+
+### 7.2 Reactivar un titular suspendido - 204 No Content
+PATCH {{baseUrl}}/customers/{{customerId}}/status
+Content-Type: application/json
+
+{
+  "status": "Active"
+}
+
+### 7.3 Desactivar al titular - 204 No Content
+PATCH {{baseUrl}}/customers/{{customerId}}/status
+Content-Type: application/json
+
+{
+  "status": "Inactive"
+}
+
+### 7.4 Idempotencia: pedir el estado actual responde 204 sin escribir  [RN-06]
+PATCH {{baseUrl}}/customers/{{customerId}}/status
+Content-Type: application/json
+
+{
+  "status": "Inactive"
+}
+
+### 7.5 ERROR 409 - Inactive es terminal, no admite reapertura  [RN-07]
+PATCH {{baseUrl}}/customers/{{customerId}}/status
+Content-Type: application/json
+
+{
+  "status": "Active"
+}
+
+### 7.6 ERROR 404 - UUID inexistente
+PATCH {{baseUrl}}/customers/11111111-2222-3333-4444-555555555555/status
+Content-Type: application/json
+
+{
+  "status": "Suspended"
+}
