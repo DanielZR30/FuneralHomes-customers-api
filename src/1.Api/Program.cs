@@ -4,6 +4,7 @@ using FH.Modules.Customer.Extensions;
 using FH.Modules.CustomerPlans.Extensions;
 using FH.Modules.Messaging.Extensions;
 using FH.Shared.Extensions;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -114,17 +115,29 @@ using (var scope = app.Services.CreateScope())
     try
     {
         // 1. Asegurar esquema en BD para cada módulo
-        var customerDb = services.GetService<FH.Modules.Customer.Infrastructure.Persistence.CustomerModuleDbContext>();
-        if (customerDb is not null) await customerDb.Database.EnsureCreatedAsync();
+        var contexts = new Microsoft.EntityFrameworkCore.DbContext?[]
+        {
+            services.GetService<FH.Modules.Customer.Infrastructure.Persistence.CustomerModuleDbContext>(),
+            services.GetService<FH.Modules.CustomerPlans.Infrastructure.CustomerPlansDbContext>(),
+            services.GetService<FH.Modules.Beneficiaries.Infrastructure.Persistence.BeneficiariesDbContext>(),
+            services.GetService<FH.Modules.Audit.Infrastructure.Persistence.AuditDbContext>()
+        };
 
-        var plansDb = services.GetService<FH.Modules.CustomerPlans.Infrastructure.CustomerPlansDbContext>();
-        if (plansDb is not null) await plansDb.Database.EnsureCreatedAsync();
-
-        var beneficiariesDb = services.GetService<FH.Modules.Beneficiaries.Infrastructure.Persistence.BeneficiariesDbContext>();
-        if (beneficiariesDb is not null) await beneficiariesDb.Database.EnsureCreatedAsync();
-
-        var auditDb = services.GetService<FH.Modules.Audit.Infrastructure.Persistence.AuditDbContext>();
-        if (auditDb is not null) await auditDb.Database.EnsureCreatedAsync();
+        foreach (var db in contexts)
+        {
+            if (db is not null)
+            {
+                var databaseCreator = db.Database.GetService<Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator>();
+                try
+                {
+                    await databaseCreator.CreateTablesAsync();
+                }
+                catch
+                {
+                    // Si ya existen las tablas o la BD, continuar
+                }
+            }
+        }
 
         // 2. Sembrar datos de prueba
         var customerSeeder = services.GetService<FH.Modules.Customer.Infrastructure.Persistence.CustomerSeeder>();
