@@ -1,28 +1,18 @@
 <Solution>
   <Folder Name="/src/" />
-  <Folder Name="/src/1.Api/">
-    <Project Path="src/1.Api/FH.Api.Customer.csproj" />
+  <Folder Name="/src/Core/">
+    <Project Path="src/Core/FH.Customers.Domain/FH.Customers.Domain.csproj" />
+    <Project Path="src/Core/FH.Customers.Application/FH.Customers.Application.csproj" />
   </Folder>
-  <Folder Name="/src/2.Modules/" />
-  <Folder Name="/src/2.Modules/FH.Modules.Audit/">
-    <Project Path="src/2.Modules/FH.Modules.Audit/FH.Modules.Audit.csproj" />
+  <Folder Name="/src/Infrastructure/">
+    <Project Path="src/Infrastructure/FH.Customers.Persistence/FH.Customers.Persistence.csproj" />
+    <Project Path="src/Infrastructure/FH.Customers.Infrastructure/FH.Customers.Infrastructure.csproj" />
   </Folder>
-  <Folder Name="/src/2.Modules/FH.Modules.Beneficiaries/">
-    <Project Path="src/2.Modules/FH.Modules.Beneficiaries/FH.Modules.Beneficiaries.csproj" />
-  </Folder>
-  <Folder Name="/src/2.Modules/FH.Modules.Customer/">
-    <Project Path="src/2.Modules/FH.Modules.Customer/FH.Modules.Customer.csproj" />
-  </Folder>
-  <Folder Name="/src/2.Modules/FH.Modules.CustomerPlans/">
-    <Project Path="src/2.Modules/FH.Modules.CustomerPlans/FH.Modules.CustomerPlans.csproj" />
-  </Folder>
-  <Folder Name="/src/3.Externals/">
-    <Project Path="src/3.Externals/FH.Shared/FH.Shared.csproj" />
-    <Project Path="src/3.Externals/FH.Modules.Messaging/FH.Modules.Messaging.csproj" />
+  <Folder Name="/src/Presentation/">
+    <Project Path="src/Presentation/FH.Customers.Api/FH.Customers.Api.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Folder Name="/tests/FH.Modules.Customer.Tests/" />
-    <Project Path="tests/FH.Modules.Customer.Tests/FH.Modules.Customer.Tests.csproj" />
-    <Project Path="tests/FH.Modules.CustomerPlans.Tests/FH.Modules.CustomerPlans.Tests.csproj" />
+    <Project Path="tests/FH.Customers.Tests/FH.Customers.Tests.csproj" />
+    <Project Path="tests/FH.CustomerPlans.Tests/FH.CustomerPlans.Tests.csproj" />
   </Folder>
 </Solution>
