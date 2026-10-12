@@ -1,8 +1,6 @@
-
-using FH.Customers.Domain.CustomerPlans;
 using FH.Customers.Domain.Exceptions;
 
-namespace FH.Customers.Domain.CustomerPlans.ValueObjects;
+namespace FH.Customers.Domain.ValueObjects;
 
 public record MaxBeneficiaries
 {

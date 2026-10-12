@@ -26,7 +26,7 @@ namespace FH.Customers.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("FH.Customers.Domain.CustomerPlans.Subscription", b =>
+            modelBuilder.Entity(" FH.Customers.Domain.Entities.Subscription", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -55,7 +55,7 @@ namespace FH.Customers.Persistence.Migrations
                         .HasDefaultValue("ACTIVE")
                         .HasColumnName("status");
 
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "Period", "FH.Customers.Domain.CustomerPlans.Subscription.Period#SubscriptionPeriod", b1 =>
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Period", " FH.Customers.Domain.Entities.Subscription.Period#SubscriptionPeriod", b1 =>
                         {
                             b1.IsRequired();
 
@@ -284,7 +284,7 @@ namespace FH.Customers.Persistence.Migrations
                     b.ToTable("members", (string)null);
                 });
 
-            modelBuilder.Entity("FH.Customers.Domain.CustomerPlans.Subscription", b =>
+            modelBuilder.Entity(" FH.Customers.Domain.Entities.Subscription", b =>
                 {
                     b.HasOne("FH.Customers.Domain.Entities.Customer", null)
                         .WithMany()
@@ -301,7 +301,7 @@ namespace FH.Customers.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("FH.Customers.Domain.CustomerPlans.Subscription", "Subscription")
+                    b.HasOne(" FH.Customers.Domain.Entities.Subscription", "Subscription")
                         .WithMany()
                         .HasForeignKey("SubscriptionId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -320,7 +320,7 @@ namespace FH.Customers.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("FH.Customers.Domain.CustomerPlans.Subscription", "Subscription")
+                    b.HasOne(" FH.Customers.Domain.Entities.Subscription", "Subscription")
                         .WithMany()
                         .HasForeignKey("SubscriptionId")
                         .OnDelete(DeleteBehavior.Restrict)

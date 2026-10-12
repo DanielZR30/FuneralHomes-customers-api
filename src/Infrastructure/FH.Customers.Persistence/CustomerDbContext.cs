@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using FH.Customers.Application.Events;
 using FH.Customers.Domain.Common;
-using FH.Customers.Domain.CustomerPlans;
 using FH.Customers.Domain.Entities;
 using FH.Customers.Persistence.Configurations;
 using FH.Customers.Persistence.CustomerPlans;

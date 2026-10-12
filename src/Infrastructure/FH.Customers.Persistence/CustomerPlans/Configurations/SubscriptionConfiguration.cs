@@ -1,10 +1,10 @@
 using CustomerEntity = FH.Customers.Domain.Entities.Customer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using FH.Customers.Domain.CustomerPlans;
-using FH.Customers.Domain.CustomerPlans.ValueObjects;
+using FH.Customers.Domain.ValueObjects;
 using FH.Customers.Domain.Enums;
 using FH.Customers.Persistence.CustomerPlans;
+using FH.Customers.Domain.Entities;
 
 namespace FH.Customers.Persistence.CustomerPlans.Configurations;
 

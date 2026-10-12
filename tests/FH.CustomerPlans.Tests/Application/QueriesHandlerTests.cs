@@ -5,8 +5,8 @@ using FH.Customers.Application.CustomerPlans.Abstractions;
 using FH.Customers.Application.CustomerPlans.Queries.GetCustomerSubscriptions;
 using FH.Customers.Application.CustomerPlans.Queries.GetSubscriptionById;
 using FH.Customers.Application.CustomerPlans.Queries.GetSubscriptionCapacity;
-using FH.Customers.Domain.CustomerPlans;
-using FH.Customers.Domain.CustomerPlans.ValueObjects;
+using FH.Customers.Domain.ValueObjects;
+using FH.Customers.Domain.Entities;
 
 namespace FH.CustomerPlans.Tests.Application;
 

@@ -3,7 +3,6 @@ using FH.Customers.Application.Beneficiaries.DTOs;
 using FH.Customers.Application.Common;
 using FH.Customers.Application.Cqrs;
 using FH.Customers.Domain.Beneficiaries.Repositories;
-using FH.Customers.Domain.CustomerPlans;
 using FH.Customers.Domain.Entities;
 using FH.Customers.Domain.Repositories;
 

@@ -5,8 +5,8 @@ using FH.Customers.Application.Cqrs;
 using FH.Customers.Application.CustomerPlans;
 using FH.Customers.Application.CustomerPlans.Abstractions;
 using FH.Customers.Application.CustomerPlans.DTOs;
-using FH.Customers.Domain.CustomerPlans;
-using FH.Customers.Domain.CustomerPlans.ValueObjects;
+using  FH.Customers.Domain.Entities;
+using FH.Customers.Domain.ValueObjects;
 using FH.Customers.Domain.Exceptions;
 
 namespace FH.Customers.Application.CustomerPlans.Commands.UpdateMaxBeneficiaries;

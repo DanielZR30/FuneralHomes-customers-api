@@ -1,6 +1,6 @@
 
 using FH.Customers.Application.CustomerPlans;
-using FH.Customers.Domain.CustomerPlans;
+using FH.Customers.Domain.Entities;
 
 namespace FH.Customers.Application.CustomerPlans.DTOs;
 

@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using FH.Customers.Domain.CustomerPlans;
-using FH.Customers.Domain.CustomerPlans.ValueObjects;
+using FH.Customers.Domain.ValueObjects;
 using FH.Customers.Domain.Enums;
 using FH.Customers.Persistence;
+using FH.Customers.Domain.Entities;
 
 namespace FH.Customers.Persistence.CustomerPlans;
 

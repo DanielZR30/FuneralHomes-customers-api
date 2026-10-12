@@ -4,8 +4,8 @@ using FH.Customers.Application.Abstractions;
 using FH.Customers.Application.CustomerPlans;
 using FH.Customers.Application.CustomerPlans.Abstractions;
 using FH.Customers.Application.CustomerPlans.Commands.UpdateMaxBeneficiaries;
-using FH.Customers.Domain.CustomerPlans;
-using FH.Customers.Domain.CustomerPlans.ValueObjects;
+using FH.Customers.Domain.ValueObjects;
+using FH.Customers.Domain.Entities;
 
 namespace FH.CustomerPlans.Tests.Application;
 
