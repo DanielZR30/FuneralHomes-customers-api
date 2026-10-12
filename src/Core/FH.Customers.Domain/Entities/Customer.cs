@@ -1,7 +1,7 @@
 
 using FH.Customers.Domain.Common;
+using FH.Customers.Domain.Common.ValueObjects;
 using FH.Customers.Domain.Enums;
-using FH.Customers.Domain.ValueObjects;
 
 namespace FH.Customers.Domain.Entities;
 

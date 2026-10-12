@@ -1,7 +1,6 @@
-
 using FH.Customers.Domain.Common;
 
-namespace FH.Customers.Domain.ValueObjects;
+namespace FH.Customers.Domain.Common.ValueObjects;
 
 /// <summary>
 /// Datos de contacto (correo y teléfono, ambos opcionales). El correo se guarda en minúsculas.

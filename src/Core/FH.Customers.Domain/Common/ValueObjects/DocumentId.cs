@@ -1,7 +1,6 @@
-
 using FH.Customers.Domain.Common;
 
-namespace FH.Customers.Domain.ValueObjects;
+namespace FH.Customers.Domain.Common.ValueObjects;
 
 /// <summary>
 /// Documento de identidad (tipo + número). Siempre queda normalizado en mayúsculas.

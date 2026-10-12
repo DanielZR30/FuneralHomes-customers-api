@@ -1,6 +1,6 @@
 using FH.Customers.Domain.Exceptions;
 
-namespace FH.Customers.Domain.ValueObjects;
+namespace FH.Customers.Domain.Common.ValueObjects;
 
 public record MaxBeneficiaries
 {

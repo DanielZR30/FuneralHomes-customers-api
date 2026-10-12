@@ -4,7 +4,7 @@ using FH.Customers.Application.Abstractions;
 using FH.Customers.Application.CustomerPlans;
 using FH.Customers.Application.CustomerPlans.Abstractions;
 using FH.Customers.Application.CustomerPlans.Commands.SubscribeCustomer;
-using FH.Customers.Domain.ValueObjects;
+using FH.Customers.Domain.Common.ValueObjects;
 using FH.Customers.Domain.Entities;
 
 namespace FH.CustomerPlans.Tests.Application;

@@ -333,7 +333,7 @@ namespace FH.Customers.Persistence.Migrations
 
             modelBuilder.Entity("FH.Customers.Domain.Entities.Customer", b =>
                 {
-                    b.OwnsOne("FH.Customers.Domain.ValueObjects.DocumentId", "Document", b1 =>
+                    b.OwnsOne("FH.Customers.Domain.Common.ValueObjects.DocumentId", "Document", b1 =>
                         {
                             b1.Property<Guid>("CustomerId")
                                 .HasColumnType("uuid");
@@ -361,7 +361,7 @@ namespace FH.Customers.Persistence.Migrations
                                 .HasForeignKey("CustomerId");
                         });
 
-                    b.OwnsOne("FH.Customers.Domain.ValueObjects.Address", "Address", b1 =>
+                    b.OwnsOne("FH.Customers.Domain.Common.ValueObjects.Address", "Address", b1 =>
                         {
                             b1.Property<Guid>("CustomerId")
                                 .HasColumnType("uuid");
@@ -388,7 +388,7 @@ namespace FH.Customers.Persistence.Migrations
 
             modelBuilder.Entity("FH.Customers.Domain.Entities.Member", b =>
                 {
-                    b.OwnsOne("FH.Customers.Domain.ValueObjects.DocumentId", "Document", b1 =>
+                    b.OwnsOne("FH.Customers.Domain.Common.ValueObjects.DocumentId", "Document", b1 =>
                         {
                             b1.Property<Guid>("MemberId")
                                 .HasColumnType("uuid");

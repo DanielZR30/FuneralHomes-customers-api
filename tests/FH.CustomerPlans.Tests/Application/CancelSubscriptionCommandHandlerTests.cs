@@ -4,7 +4,7 @@ using FH.Customers.Application.Abstractions;
 using FH.Customers.Application.CustomerPlans;
 using FH.Customers.Application.CustomerPlans.Abstractions;
 using FH.Customers.Application.CustomerPlans.Commands.CancelSubscription;
-using FH.Customers.Domain.ValueObjects;
+using FH.Customers.Domain.Common.ValueObjects;
 using FH.Customers.Domain.Enums;
 using FH.Customers.Domain.Entities;
 

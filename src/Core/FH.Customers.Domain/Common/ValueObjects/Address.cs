@@ -1,7 +1,6 @@
-
 using FH.Customers.Domain.Common;
 
-namespace FH.Customers.Domain.ValueObjects;
+namespace FH.Customers.Domain.Common.ValueObjects;
 
 /// <summary>
 /// Dirección de texto. No puede ser vacía: si no hay dirección, la propiedad del dueño es null.
