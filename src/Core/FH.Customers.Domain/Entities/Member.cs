@@ -44,7 +44,7 @@ public class Member : BaseEntity<Guid>
         FirstName = firstName.Trim();
         LastName = string.IsNullOrWhiteSpace(lastName) ? null : lastName.Trim();
         BirthDate = birthDate;
-        DerivedAge = DerivedAgeCalculator.Calculate(birthDate);
+        DerivedAge = CalculateAge(birthDate);
 
         Document = BuildDocument(identificationType, identificationNumber);
         Contact = new ContactInfo(email, phone);
@@ -74,7 +74,7 @@ public class Member : BaseEntity<Guid>
 
     public void RefreshDerivedAge(DateOnly? asOfDate = null)
     {
-        DerivedAge = DerivedAgeCalculator.Calculate(BirthDate, asOfDate);
+        DerivedAge = CalculateAge(BirthDate, asOfDate);
     }
 
     public void UpdateDetails(
@@ -90,7 +90,7 @@ public class Member : BaseEntity<Guid>
             throw new BusinessRuleException("El nombre del miembro es obligatorio.");
 
         // Se calcula primero: si la fecha es futura, falla antes de modificar nada.
-        var derivedAge = DerivedAgeCalculator.Calculate(birthDate);
+        var derivedAge = CalculateAge(birthDate);
         var document = BuildDocument(identificationType, identificationNumber);
 
         FirstName = firstName.Trim();
@@ -114,5 +114,23 @@ public class Member : BaseEntity<Guid>
             throw new BusinessRuleException("El tipo y el número de identificación deben informarse juntos.");
 
         return new DocumentId(type!, number!);
+    }
+
+    private static int CalculateAge(DateOnly birthDate, DateOnly? asOfDate = null)
+    {
+        var targetDate = asOfDate ?? DateOnly.FromDateTime(DateTime.UtcNow);
+
+        if (birthDate > targetDate)
+            throw new BusinessRuleException("La fecha de nacimiento no puede ser posterior a la fecha actual.");
+
+        var age = targetDate.Year - birthDate.Year;
+
+        if (targetDate.Month < birthDate.Month ||
+            (targetDate.Month == birthDate.Month && targetDate.Day < birthDate.Day))
+        {
+            age--;
+        }
+
+        return Math.Max(0, age);
     }
 }
