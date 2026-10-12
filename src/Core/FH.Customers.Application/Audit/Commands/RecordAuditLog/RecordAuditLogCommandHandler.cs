@@ -2,7 +2,7 @@
 using FH.Customers.Application.Abstractions;
 using FH.Customers.Application.Common;
 using FH.Customers.Application.Cqrs;
-using FH.Customers.Domain.Audit.Repositories;
+using FH.Customers.Domain.Repositories;
 using FH.Customers.Domain.Entities;
 using FH.Customers.Domain.Repositories;
 

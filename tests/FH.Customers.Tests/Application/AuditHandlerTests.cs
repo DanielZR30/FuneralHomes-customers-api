@@ -3,7 +3,7 @@ using FH.Customers.Application.Abstractions;
 using FH.Customers.Application.Audit.Commands.MarkAsPublished;
 using FH.Customers.Application.Audit.Commands.RecordAuditLog;
 using FH.Customers.Application.Audit.EventHandlers;
-using FH.Customers.Domain.Audit.Repositories;
+using FH.Customers.Domain.Repositories;
 using FH.Customers.Domain.Entities;
 using FH.Customers.Domain.Enums;
 using FH.Customers.Domain.Events;

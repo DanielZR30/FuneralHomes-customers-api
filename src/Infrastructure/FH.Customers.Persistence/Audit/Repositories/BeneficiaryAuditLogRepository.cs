@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using FH.Customers.Domain.Audit.Repositories;
+using FH.Customers.Domain.Repositories;
 using FH.Customers.Domain.Entities;
 using FH.Customers.Persistence;
 

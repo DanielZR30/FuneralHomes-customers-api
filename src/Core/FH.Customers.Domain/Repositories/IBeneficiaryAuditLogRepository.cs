@@ -1,7 +1,7 @@
 
 using FH.Customers.Domain.Entities;
 
-namespace FH.Customers.Domain.Audit.Repositories;
+namespace FH.Customers.Domain.Repositories;
 
 public interface IBeneficiaryAuditLogRepository
 {

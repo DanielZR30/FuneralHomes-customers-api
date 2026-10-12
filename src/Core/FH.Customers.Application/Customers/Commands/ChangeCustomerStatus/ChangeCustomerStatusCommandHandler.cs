@@ -2,7 +2,6 @@
 using FH.Customers.Application.Abstractions;
 using FH.Customers.Application.Common;
 using FH.Customers.Application.Cqrs;
-using FH.Customers.Domain.Customers.Repositories;
 using FH.Customers.Domain.Enums;
 using FH.Customers.Domain.Repositories;
 

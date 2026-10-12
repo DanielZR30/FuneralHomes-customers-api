@@ -1,8 +1,7 @@
-
 using FH.Customers.Domain.Entities;
 using FH.Customers.Domain.Enums;
 
-namespace FH.Customers.Domain.Beneficiaries.Repositories;
+namespace FH.Customers.Domain.Repositories;
 
 public interface IBeneficiaryRepository
 {

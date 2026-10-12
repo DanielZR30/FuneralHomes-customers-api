@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using CustomerEntity = FH.Customers.Domain.Entities.Customer;
-using FH.Customers.Domain.Customers.Repositories;
 using FH.Customers.Persistence.Repositories;
+using FH.Customers.Domain.Repositories;
 
 namespace FH.Customers.Persistence.Customers.Repositories;
 

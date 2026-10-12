@@ -1,7 +1,6 @@
 using CustomerEntity = FH.Customers.Domain.Entities.Customer;
-using FH.Customers.Domain.Repositories;
 
-namespace FH.Customers.Domain.Customers.Repositories;
+namespace FH.Customers.Domain.Repositories;
 
 public interface ICustomerRepository : IRepository<CustomerEntity, Guid>
 {

@@ -3,7 +3,6 @@ using CustomerEntity = FH.Customers.Domain.Entities.Customer;
 using FH.Customers.Application.Abstractions;
 using FH.Customers.Application.Customers.Commands.ChangeCustomerStatus;
 using FH.Customers.Application.Customers.Commands.UpdateCustomerDemographics;
-using FH.Customers.Domain.Customers.Repositories;
 using FH.Customers.Domain.Enums;
 using FH.Customers.Domain.Repositories;
 

@@ -2,7 +2,6 @@ using Moq;
 using FH.Customers.Application.Abstractions;
 using FH.Customers.Application.Beneficiaries.Commands.AddBeneficiary;
 using FH.Customers.Application.Beneficiaries.Commands.RemoveBeneficiary;
-using FH.Customers.Domain.Beneficiaries.Repositories;
 using FH.Customers.Domain.ValueObjects;
 using FH.Customers.Domain.Entities;
 using FH.Customers.Domain.Enums;
