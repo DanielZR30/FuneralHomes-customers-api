@@ -6,7 +6,7 @@ using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Application.Contracts.Persistence;
 using FH.Customers.Application.Contracts.Gateways;
 using FH.Customers.Application.Utilities.Results;
-using FH.Customers.Application.UseCases.CustomerPlans.DTOs;
+using FH.Customers.Application.UseCases.CustomerPlans.Common;
 using FH.Customers.Application.UseCases.Common;
 
 namespace FH.Customers.Application.UseCases.CustomerPlans.Commands.UpdateMaxBeneficiaries;

@@ -6,7 +6,7 @@ using FH.Customers.Application.UseCases.CustomerPlans.Queries.GetCustomerSubscri
 using FH.Customers.Application.UseCases.CustomerPlans.Queries.GetSubscriptionById;
 using FH.Customers.Application.UseCases.CustomerPlans.Queries.GetSubscriptionCapacity;
 using FH.Customers.Application.Utilities.Results;
-using FH.Customers.Application.UseCases.CustomerPlans.DTOs;
+using FH.Customers.Application.UseCases.CustomerPlans.Common;
 using FH.Customers.Api.DTOs.CustomerPlans;
 
 namespace FH.Customers.Api.Controllers;

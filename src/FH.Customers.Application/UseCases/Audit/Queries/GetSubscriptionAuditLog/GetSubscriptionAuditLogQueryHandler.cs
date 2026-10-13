@@ -2,7 +2,7 @@ using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Domain.Entities;
 using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Application.Utilities.Results;
-using FH.Customers.Application.UseCases.Audit.DTOs;
+using FH.Customers.Application.UseCases.Audit.Common;
 using FH.Customers.Application.UseCases.Common;
 
 namespace FH.Customers.Application.UseCases.Audit.Queries.GetSubscriptionAuditLog;

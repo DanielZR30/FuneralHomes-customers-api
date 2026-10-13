@@ -1,7 +1,7 @@
 using FH.Customers.Domain.Common.Enums;
 using FH.Customers.Domain.Entities;
 
-namespace FH.Customers.Application.UseCases.Beneficiaries.DTOs;
+namespace FH.Customers.Application.UseCases.Beneficiaries.Common;
 
 public record BeneficiaryResponse(
     Guid Id,

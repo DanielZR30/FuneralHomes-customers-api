@@ -1,7 +1,7 @@
 using FH.Customers.Domain.Entities;
 using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Application.Utilities.Results;
-using FH.Customers.Application.UseCases.Beneficiaries.DTOs;
+using FH.Customers.Application.UseCases.Beneficiaries.Common;
 using FH.Customers.Application.UseCases.Common;
 
 namespace FH.Customers.Application.UseCases.Beneficiaries.Queries.GetBeneficiariesBySubscription;

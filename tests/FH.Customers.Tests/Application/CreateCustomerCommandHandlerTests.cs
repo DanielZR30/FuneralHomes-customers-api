@@ -2,7 +2,7 @@ using Moq;
 using CustomerEntity = FH.Customers.Domain.Entities.Customer;
 using FH.Customers.Application.Contracts.Persistence;
 using FH.Customers.Application.Exceptions;
-using FH.Customers.Application.UseCases.Customers.DTOs;
+using FH.Customers.Application.UseCases.Customers.Common;
 using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Domain.Common.Enums;
 using FH.Customers.Application.Contracts.Persistence;

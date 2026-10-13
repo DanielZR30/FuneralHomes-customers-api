@@ -1,4 +1,4 @@
-using FH.Customers.Application.UseCases.Beneficiaries.DTOs;
+using FH.Customers.Application.UseCases.Beneficiaries.Common;
 using FH.Customers.Application.UseCases.Common;
 using FH.Customers.Domain.Common.Enums;
 

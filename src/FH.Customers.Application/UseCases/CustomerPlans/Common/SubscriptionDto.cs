@@ -1,6 +1,6 @@
 using FH.Customers.Domain.Entities;
 
-namespace FH.Customers.Application.UseCases.CustomerPlans.DTOs;
+namespace FH.Customers.Application.UseCases.CustomerPlans.Common;
 
 public record SubscriptionDto(
     Guid Id,

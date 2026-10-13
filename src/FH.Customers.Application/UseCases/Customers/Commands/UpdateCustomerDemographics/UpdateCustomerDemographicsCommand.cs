@@ -1,5 +1,5 @@
 using FH.Customers.Application.UseCases.Common;
-using FH.Customers.Application.UseCases.Customers.DTOs;
+using FH.Customers.Application.UseCases.Customers.Common;
 
 namespace FH.Customers.Application.UseCases.Customers.Commands.UpdateCustomerDemographics;
 

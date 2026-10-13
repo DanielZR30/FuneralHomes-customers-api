@@ -1,4 +1,4 @@
-namespace FH.Customers.Application.UseCases.CustomerPlans.DTOs;
+namespace FH.Customers.Application.UseCases.CustomerPlans.Common;
 
 public record SubscriptionCapacityDto(
     Guid SubscriptionId,

@@ -1,6 +1,6 @@
 using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Application.Utilities.Results;
-using FH.Customers.Application.UseCases.Customers.DTOs;
+using FH.Customers.Application.UseCases.Customers.Common;
 using FH.Customers.Application.UseCases.Common;
 
 namespace FH.Customers.Application.UseCases.Customers.Queries.GetCustomerByIdentification;

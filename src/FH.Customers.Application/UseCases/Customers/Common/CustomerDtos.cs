@@ -1,7 +1,7 @@
 using FH.Customers.Domain.Common.Enums;
 using FH.Customers.Domain.Entities;
 
-namespace FH.Customers.Application.UseCases.Customers.DTOs;
+namespace FH.Customers.Application.UseCases.Customers.Common;
 
 public record CustomerResponse(
     Guid Id,

@@ -1,6 +1,6 @@
 using FH.Customers.Domain.Entities;
 
-namespace FH.Customers.Application.UseCases.Audit.DTOs;
+namespace FH.Customers.Application.UseCases.Audit.Common;
 
 public record AuditLogResponse(
     Guid Id,

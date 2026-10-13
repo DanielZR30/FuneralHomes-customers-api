@@ -20,8 +20,4 @@
     <ProjectReference Include="..\FH.Customers.Domain\FH.Customers.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="UseCases\CustomerPlans\Abstractions\" />
-  </ItemGroup>
-
 </Project>
