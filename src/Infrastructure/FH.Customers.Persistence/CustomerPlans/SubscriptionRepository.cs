@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using FH.Customers.Application.CustomerPlans;
-using FH.Customers.Application.CustomerPlans.Abstractions;
 using FH.Customers.Persistence;
 using FH.Customers.Domain.Entities;
 using FH.Customers.Domain.Common.Enums;
+using FH.Customers.Application.Contracts.Repositories;
 
 namespace FH.Customers.Persistence.CustomerPlans;
 

@@ -2,9 +2,9 @@
 using FH.Customers.Application.Abstractions;
 using FH.Customers.Application.Common;
 using FH.Customers.Application.Cqrs;
-using FH.Customers.Domain.Repositories;
+using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Domain.Entities;
-using FH.Customers.Domain.Repositories;
+using FH.Customers.Application.Contracts.Repositories;
 
 namespace FH.Customers.Application.Audit.Commands.RecordAuditLog;
 

@@ -1,6 +1,6 @@
 
 using FH.Customers.Application.Events;
-using FH.Customers.Domain.Repositories;
+using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Domain.Entities;
 using FH.Customers.Domain.Common.Events;
 using FH.Customers.Domain.Common.Enums;

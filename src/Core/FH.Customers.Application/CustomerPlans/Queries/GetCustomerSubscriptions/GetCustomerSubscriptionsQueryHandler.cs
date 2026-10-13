@@ -1,8 +1,8 @@
 
 using FH.Customers.Application.Common;
+using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Application.Cqrs;
 using FH.Customers.Application.CustomerPlans;
-using FH.Customers.Application.CustomerPlans.Abstractions;
 using FH.Customers.Application.CustomerPlans.DTOs;
 
 namespace FH.Customers.Application.CustomerPlans.Queries.GetCustomerSubscriptions;

@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using FH.Customers.Domain.Common;
-using FH.Customers.Domain.Repositories;
+using FH.Customers.Application.Contracts.Repositories;
 
 namespace FH.Customers.Persistence.Repositories;
 

@@ -1,12 +1,14 @@
 using Moq;
 using Xunit;
 using FH.Customers.Application.CustomerPlans;
+using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Application.CustomerPlans.Abstractions;
 using FH.Customers.Application.CustomerPlans.Queries.GetCustomerSubscriptions;
 using FH.Customers.Application.CustomerPlans.Queries.GetSubscriptionById;
 using FH.Customers.Application.CustomerPlans.Queries.GetSubscriptionCapacity;
 using FH.Customers.Domain.Common.ValueObjects;
 using FH.Customers.Domain.Entities;
+using FH.Customers.Application.Contracts.Repositories;
 
 namespace FH.CustomerPlans.Tests.Application;
 

@@ -3,7 +3,7 @@ using FH.Customers.Application.Abstractions;
 using FH.Customers.Application.Common;
 using FH.Customers.Application.Cqrs;
 using FH.Customers.Domain.Common.Enums;
-using FH.Customers.Domain.Repositories;
+using FH.Customers.Application.Contracts.Repositories;
 
 namespace FH.Customers.Application.Customers.Commands.ChangeCustomerStatus;
 

@@ -1,8 +1,6 @@
-
-using FH.Customers.Application.CustomerPlans;
 using FH.Customers.Domain.Entities;
 
-namespace FH.Customers.Application.CustomerPlans.Abstractions;
+namespace FH.Customers.Application.Contracts.Repositories;
 
 public interface ISubscriptionRepository
 {

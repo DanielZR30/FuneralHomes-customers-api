@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using FH.Customers.Domain.Common;
 
-namespace FH.Customers.Domain.Repositories;
+namespace FH.Customers.Application.Contracts.Repositories;
 
 /// <summary>
 /// Contrato genérico de Repositorio para entidades fuertemente tipadas por Id.

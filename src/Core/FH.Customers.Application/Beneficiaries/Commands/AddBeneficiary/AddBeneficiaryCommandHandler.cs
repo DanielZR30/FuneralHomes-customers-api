@@ -6,7 +6,7 @@ using FH.Customers.Application.Cqrs;
 using FH.Customers.Domain.Common.Enums;
 using FH.Customers.Domain.Entities;
 using FH.Customers.Domain.Exceptions;
-using FH.Customers.Domain.Repositories;
+using FH.Customers.Application.Contracts.Repositories;
 
 namespace FH.Customers.Application.Beneficiaries.Commands.AddBeneficiary;
 

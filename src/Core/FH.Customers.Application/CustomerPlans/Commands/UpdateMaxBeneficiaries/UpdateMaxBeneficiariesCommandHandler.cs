@@ -3,11 +3,13 @@ using FH.Customers.Application.Abstractions;
 using FH.Customers.Application.Common;
 using FH.Customers.Application.Cqrs;
 using FH.Customers.Application.CustomerPlans;
+using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Application.CustomerPlans.Abstractions;
 using FH.Customers.Application.CustomerPlans.DTOs;
 using  FH.Customers.Domain.Entities;
 using FH.Customers.Domain.Common.ValueObjects;
 using FH.Customers.Domain.Exceptions;
+using FH.Customers.Application.Contracts.Repositories;
 
 namespace FH.Customers.Application.CustomerPlans.Commands.UpdateMaxBeneficiaries;
 

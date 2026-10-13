@@ -3,7 +3,7 @@ using CustomerEntity = FH.Customers.Domain.Entities.Customer;
 using FH.Customers.Application.Customers.Queries.GetCustomerById;
 using FH.Customers.Application.Customers.Queries.GetCustomerByIdentification;
 using FH.Customers.Application.Customers.Queries.GetCustomers;
-using FH.Customers.Domain.Repositories;
+using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Domain.Common.Enums;
 
 namespace FH.Customers.Tests.Application;

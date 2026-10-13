@@ -2,7 +2,7 @@
 using FH.Customers.Application.Audit.DTOs;
 using FH.Customers.Application.Common;
 using FH.Customers.Application.Cqrs;
-using FH.Customers.Domain.Repositories;
+using FH.Customers.Application.Contracts.Repositories;
 
 namespace FH.Customers.Application.Audit.Queries.GetUnpublishedAuditLogs;
 

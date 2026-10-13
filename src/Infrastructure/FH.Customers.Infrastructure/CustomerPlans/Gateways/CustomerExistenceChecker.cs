@@ -1,8 +1,9 @@
 using CustomerEntity = FH.Customers.Domain.Entities.Customer;
 using FH.Customers.Application.CustomerPlans;
+using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Application.CustomerPlans.Abstractions;
 using FH.Customers.Domain.Entities;
-using FH.Customers.Domain.Repositories;
+using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Infrastructure.MockData;
 using FH.Customers.Domain.Common.Enums;
 
