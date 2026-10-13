@@ -40,7 +40,8 @@ public static class DependencyInjection
         services.AddScoped<IBeneficiaryAuditLogRepository, BeneficiaryAuditLogRepository>();
         services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
 
-        // Seeder para desarrollo
+        // Seeders de datos iniciales para desarrollo (se ejecutan por su propiedad Order)
+        services.AddScoped<IDataSeeder, CustomerSeeder>();
         services.AddScoped<IDataSeeder, SubscriptionSeeder>();
 
         return services;

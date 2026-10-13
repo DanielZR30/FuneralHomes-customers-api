@@ -2,6 +2,7 @@ using Microsoft.OpenApi;
 using FH.Customers.Application;
 using FH.Customers.Infrastructure;
 using FH.Customers.Persistence;
+using FH.Customers.Persistence.Seeds;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,12 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+// Datos iniciales de desarrollo (cliente y suscripción de ejemplo)
+if (app.Environment.IsDevelopment())
+{
+    await DataBaseSeeder.SeedAsync(app.Services);
+}
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>

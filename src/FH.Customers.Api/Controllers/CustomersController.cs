@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using FH.Customers.Application.Utilities.Mediator;
 using FH.Customers.Application.UseCases.Customers.Commands.ChangeCustomerStatus;
 using FH.Customers.Application.UseCases.Customers.Commands.CreateCustomer;
 using FH.Customers.Application.UseCases.Customers.Commands.UpdateCustomerDemographics;
@@ -13,7 +14,7 @@ namespace FH.Customers.Api.Controllers;
 
 [Route("api/v1/customers")]
 [Tags("Customers")]
-public class CustomersController : ApiControllerBase
+public class CustomersController(IMediator mediator) : ApiControllerBase(mediator)
 {
     /// <summary>Registrar un nuevo cliente titular (Persona Natural o Empresa)</summary>
     [HttpPost]

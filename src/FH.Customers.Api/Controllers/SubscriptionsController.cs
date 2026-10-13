@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using FH.Customers.Application.Utilities.Mediator;
 using FH.Customers.Application.UseCases.CustomerPlans.Commands.CancelSubscription;
 using FH.Customers.Application.UseCases.CustomerPlans.Commands.SubscribeCustomer;
 using FH.Customers.Application.UseCases.CustomerPlans.Commands.UpdateMaxBeneficiaries;
@@ -13,7 +14,7 @@ namespace FH.Customers.Api.Controllers;
 
 [Route("api/v1/subscriptions")]
 [Tags("Subscriptions")]
-public class SubscriptionsController : ApiControllerBase
+public class SubscriptionsController(IMediator mediator) : ApiControllerBase(mediator)
 {
     /// <summary>Suscribir cliente titular a un plan funerario con límite de cupos</summary>
     [HttpPost]

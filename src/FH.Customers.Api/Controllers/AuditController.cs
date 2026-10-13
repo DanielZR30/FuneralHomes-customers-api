@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using FH.Customers.Application.Utilities.Mediator;
 using FH.Customers.Application.UseCases.Audit.Queries.GetMemberAuditLog;
 using FH.Customers.Application.UseCases.Audit.Queries.GetSubscriptionAuditLog;
 using FH.Customers.Application.UseCases.Audit.Common;
@@ -6,7 +7,7 @@ using FH.Customers.Application.UseCases.Audit.Common;
 namespace FH.Customers.Api.Controllers;
 
 [Tags("Audit")]
-public class AuditController : ApiControllerBase
+public class AuditController(IMediator mediator) : ApiControllerBase(mediator)
 {
     /// <summary>Consultar historial cronológico inmutable de novedades de una suscripción (Módulo Audit)</summary>
     [HttpGet("api/v1/subscriptions/{subscriptionId:guid}/audit-log")]

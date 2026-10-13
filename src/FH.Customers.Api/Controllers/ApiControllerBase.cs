@@ -9,12 +9,9 @@ namespace FH.Customers.Api.Controllers;
 /// al código HTTP que trae (400, 404, 409, 422...) con el cuerpo { message }.
 /// </summary>
 [ApiController]
-public abstract class ApiControllerBase : ControllerBase
+public abstract class ApiControllerBase(IMediator mediator) : ControllerBase
 {
-    private IMediator? _mediator;
-
-    protected IMediator Mediator =>
-        _mediator ??= HttpContext.RequestServices.GetRequiredService<IMediator>();
+    protected IMediator Mediator { get; } = mediator;
 
     protected IActionResult ToError(Result result) =>
         StatusCode(result.StatusCode, new { message = result.ErrorMessage });

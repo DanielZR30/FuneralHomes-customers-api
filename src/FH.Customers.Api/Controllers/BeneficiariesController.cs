@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using FH.Customers.Application.Utilities.Mediator;
 using FH.Customers.Application.UseCases.Beneficiaries.Commands.AddBeneficiary;
 using FH.Customers.Application.UseCases.Beneficiaries.Commands.RemoveBeneficiary;
 using FH.Customers.Application.UseCases.Beneficiaries.Commands.UpdateBeneficiary;
@@ -11,7 +12,7 @@ namespace FH.Customers.Api.Controllers;
 
 [Route("api/v1/subscriptions/{subscriptionId:guid}/beneficiaries")]
 [Tags("Beneficiaries")]
-public class BeneficiariesController : ApiControllerBase
+public class BeneficiariesController(IMediator mediator) : ApiControllerBase(mediator)
 {
     /// <summary>Incorporar un beneficiario (persona o mascota) a una suscripción activa</summary>
     [HttpPost]
