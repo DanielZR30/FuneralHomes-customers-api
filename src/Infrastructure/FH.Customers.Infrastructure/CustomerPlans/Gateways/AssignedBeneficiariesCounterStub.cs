@@ -1,7 +1,7 @@
 
-using FH.Customers.Application.CustomerPlans;
+using FH.Customers.Application.UseCases.CustomerPlans;
 using FH.Customers.Application.Contracts.Repositories;
-using FH.Customers.Application.CustomerPlans.Abstractions;
+using FH.Customers.Application.Contracts.Gateways;
 
 namespace FH.Customers.Infrastructure.CustomerPlans.Gateways;
 

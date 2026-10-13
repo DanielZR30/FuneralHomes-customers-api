@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using FH.Customers.Application.CustomerPlans;
+using FH.Customers.Application.UseCases.CustomerPlans;
 using FH.Customers.Persistence;
 using FH.Customers.Domain.Entities;
 using FH.Customers.Domain.Common.Enums;

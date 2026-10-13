@@ -1,11 +1,12 @@
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
-using FH.Customers.Application.Common;
-using FH.Customers.Application.Events;
-using FH.Customers.Application.Mediator;
 using FH.Customers.Domain.Common;
 using FH.Customers.Domain.Exceptions;
+using FH.Customers.Application.Utilities.Mediator;
+using FH.Customers.Application.Utilities.Events;
+using FH.Customers.Application.Utilities.Results;
+using FH.Customers.Application.Exceptions;
 
 namespace FH.Customers.Tests.Application;
 

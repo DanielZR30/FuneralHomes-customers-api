@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using FH.Customers.Application.Common;
-using FH.Customers.Application.Mediator;
+using FH.Customers.Application.Utilities.Mediator;
+using FH.Customers.Application.Utilities.Results;
 
 namespace FH.Customers.Api.Controllers;
 

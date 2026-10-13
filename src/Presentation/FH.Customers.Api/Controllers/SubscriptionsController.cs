@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using FH.Customers.Api.Requests;
-using FH.Customers.Application.Common;
-using FH.Customers.Application.CustomerPlans;
-using FH.Customers.Application.CustomerPlans.Commands.CancelSubscription;
-using FH.Customers.Application.CustomerPlans.Commands.SubscribeCustomer;
-using FH.Customers.Application.CustomerPlans.Commands.UpdateMaxBeneficiaries;
-using FH.Customers.Application.CustomerPlans.DTOs;
-using FH.Customers.Application.CustomerPlans.Queries.GetCustomerSubscriptions;
-using FH.Customers.Application.CustomerPlans.Queries.GetSubscriptionById;
-using FH.Customers.Application.CustomerPlans.Queries.GetSubscriptionCapacity;
+using FH.Customers.Application.UseCases.CustomerPlans;
+using FH.Customers.Application.UseCases.CustomerPlans.Commands.CancelSubscription;
+using FH.Customers.Application.UseCases.CustomerPlans.Commands.SubscribeCustomer;
+using FH.Customers.Application.UseCases.CustomerPlans.Commands.UpdateMaxBeneficiaries;
+using FH.Customers.Application.UseCases.CustomerPlans.Queries.GetCustomerSubscriptions;
+using FH.Customers.Application.UseCases.CustomerPlans.Queries.GetSubscriptionById;
+using FH.Customers.Application.UseCases.CustomerPlans.Queries.GetSubscriptionCapacity;
+using FH.Customers.Application.Utilities.Results;
+using FH.Customers.Application.UseCases.CustomerPlans.DTOs;
 
 namespace FH.Customers.Api.Controllers;
 

@@ -1,8 +1,10 @@
 using Xunit;
-using FH.Customers.Application.CustomerPlans;
-using FH.Customers.Application.CustomerPlans.Commands.CancelSubscription;
-using FH.Customers.Application.CustomerPlans.Commands.SubscribeCustomer;
-using FH.Customers.Application.CustomerPlans.Commands.UpdateMaxBeneficiaries;
+using FH.Customers.Application.UseCases.CustomerPlans;
+using FH.Customers.Application.UseCases.CustomerPlans.Commands.CancelSubscription;
+using FH.Customers.Application.UseCases.CustomerPlans.Commands.SubscribeCustomer;
+using FH.Customers.Application.UseCases.CustomerPlans.Commands.UpdateMaxBeneficiaries;
+using FH.Customers.Application.UseCases.CustomerPlans.Commands.CancelSubscription;
+using FH.Customers.Application.UseCases.CustomerPlans.Commands.UpdateMaxBeneficiaries;
 
 namespace FH.CustomerPlans.Tests.Application;
 

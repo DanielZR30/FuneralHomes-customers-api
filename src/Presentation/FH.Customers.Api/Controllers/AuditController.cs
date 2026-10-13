@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using FH.Customers.Application.Audit.DTOs;
-using FH.Customers.Application.Audit.Queries.GetMemberAuditLog;
-using FH.Customers.Application.Audit.Queries.GetSubscriptionAuditLog;
+using FH.Customers.Application.UseCases.Audit.Queries.GetMemberAuditLog;
+using FH.Customers.Application.UseCases.Audit.Queries.GetSubscriptionAuditLog;
+using FH.Customers.Application.UseCases.Audit.DTOs;
 
 namespace FH.Customers.Api.Controllers;
 

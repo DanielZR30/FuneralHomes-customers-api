@@ -1,7 +1,7 @@
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
-using FH.Customers.Application.Events;
-using FH.Customers.Application.Mediator;
+using FH.Customers.Application.Utilities.Mediator;
+using FH.Customers.Application.Utilities.Events;
 
 namespace FH.Customers.Application;
 

@@ -1,4 +1,4 @@
-﻿using FH.Customers.Application.Messaging;
+﻿using FH.Customers.Application.Contracts.Messaging;
 using Microsoft.Extensions.Logging;
 
 namespace FH.Customers.Infrastructure.Messaging;

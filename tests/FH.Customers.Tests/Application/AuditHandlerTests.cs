@@ -1,12 +1,12 @@
 using Moq;
-using FH.Customers.Application.Abstractions;
-using FH.Customers.Application.Audit.Commands.MarkAsPublished;
-using FH.Customers.Application.Audit.Commands.RecordAuditLog;
-using FH.Customers.Application.Audit.EventHandlers;
+using FH.Customers.Application.UseCases.Audit.Commands.MarkAsPublished;
+using FH.Customers.Application.UseCases.Audit.Commands.RecordAuditLog;
+using FH.Customers.Application.UseCases.Audit.EventHandlers;
 using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Domain.Entities;
 using FH.Customers.Domain.Common.Events;
 using FH.Customers.Domain.Common.Enums;
+using FH.Customers.Application.Contracts.Persistence;
 
 namespace FH.Customers.Tests.Application;
 

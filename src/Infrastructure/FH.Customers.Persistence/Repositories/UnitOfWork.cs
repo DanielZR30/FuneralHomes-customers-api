@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using FH.Customers.Application.Abstractions;
+using FH.Customers.Application.Contracts.Persistence;
 using FH.Customers.Persistence;
+using FH.Customers.Application.Exceptions;
 
 namespace FH.Customers.Persistence.Repositories;
 

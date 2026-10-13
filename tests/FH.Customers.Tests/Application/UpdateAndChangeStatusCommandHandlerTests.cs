@@ -1,10 +1,10 @@
 using Moq;
 using CustomerEntity = FH.Customers.Domain.Entities.Customer;
-using FH.Customers.Application.Abstractions;
-using FH.Customers.Application.Customers.Commands.ChangeCustomerStatus;
-using FH.Customers.Application.Customers.Commands.UpdateCustomerDemographics;
 using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Domain.Common.Enums;
+using FH.Customers.Application.Contracts.Persistence;
+using FH.Customers.Application.UseCases.Customers.Commands.ChangeCustomerStatus;
+using FH.Customers.Application.UseCases.Customers.Commands.UpdateCustomerDemographics;
 
 namespace FH.Customers.Tests.Application;
 

@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
-using FH.Customers.Application.Customers.Commands.ChangeCustomerStatus;
-using FH.Customers.Application.Customers.Commands.CreateCustomer;
-using FH.Customers.Application.Customers.Commands.UpdateCustomerDemographics;
-using FH.Customers.Application.Customers.DTOs;
-using FH.Customers.Application.Customers.Queries.GetCustomerById;
-using FH.Customers.Application.Customers.Queries.GetCustomerByIdentification;
-using FH.Customers.Application.Customers.Queries.GetCustomers;
+using FH.Customers.Application.UseCases.Customers.Commands.ChangeCustomerStatus;
+using FH.Customers.Application.UseCases.Customers.Commands.CreateCustomer;
+using FH.Customers.Application.UseCases.Customers.Commands.UpdateCustomerDemographics;
+using FH.Customers.Application.UseCases.Customers.Queries.GetCustomerById;
+using FH.Customers.Application.UseCases.Customers.Queries.GetCustomerByIdentification;
+using FH.Customers.Application.UseCases.Customers.Queries.GetCustomers;
 using FH.Customers.Domain.Common.Enums;
+using FH.Customers.Application.UseCases.Customers.DTOs;
 
 namespace FH.Customers.Api.Controllers;
 

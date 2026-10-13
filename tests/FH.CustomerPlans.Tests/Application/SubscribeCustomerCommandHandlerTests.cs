@@ -1,13 +1,13 @@
 using Moq;
 using Xunit;
-using FH.Customers.Application.Abstractions;
-using FH.Customers.Application.CustomerPlans;
+using FH.Customers.Application.UseCases.CustomerPlans;
 using FH.Customers.Application.Contracts.Repositories;
-using FH.Customers.Application.CustomerPlans.Abstractions;
-using FH.Customers.Application.CustomerPlans.Commands.SubscribeCustomer;
 using FH.Customers.Domain.Common.ValueObjects;
 using FH.Customers.Domain.Entities;
 using FH.Customers.Application.Contracts.Repositories;
+using FH.Customers.Application.Contracts.Persistence;
+using FH.Customers.Application.Contracts.Gateways;
+using FH.Customers.Application.UseCases.CustomerPlans.Commands.SubscribeCustomer;
 
 namespace FH.CustomerPlans.Tests.Application;
 

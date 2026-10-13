@@ -1,12 +1,12 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using FH.Customers.Application.CustomerPlans;
+using FH.Customers.Application.UseCases.CustomerPlans;
 using FH.Customers.Application.Contracts.Repositories;
-using FH.Customers.Application.CustomerPlans.Abstractions;
-using FH.Customers.Application.Messaging;
 using FH.Customers.Infrastructure.CustomerPlans.Gateways;
 using FH.Customers.Infrastructure.Messaging;
 using FH.Customers.Infrastructure.MockData;
+using FH.Customers.Application.Contracts.Gateways;
+using FH.Customers.Application.Contracts.Messaging;
 
 namespace FH.Customers.Infrastructure;
 

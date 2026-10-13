@@ -1,9 +1,9 @@
 
-using FH.Customers.Application.Beneficiaries.Commands.AddBeneficiary;
-using FH.Customers.Application.Beneficiaries.Commands.UpdateBeneficiary;
-using FH.Customers.Application.Customers.Commands.CreateCustomer;
-using FH.Customers.Application.Customers.Commands.UpdateCustomerDemographics;
-using FH.Customers.Application.Customers.Queries.GetCustomerByIdentification;
+using FH.Customers.Application.UseCases.Beneficiaries.Commands.AddBeneficiary;
+using FH.Customers.Application.UseCases.Beneficiaries.Commands.UpdateBeneficiary;
+using FH.Customers.Application.UseCases.Customers.Commands.CreateCustomer;
+using FH.Customers.Application.UseCases.Customers.Commands.UpdateCustomerDemographics;
+using FH.Customers.Application.UseCases.Customers.Queries.GetCustomerByIdentification;
 using FH.Customers.Domain.Common.Enums;
 
 namespace FH.Customers.Tests.Application;

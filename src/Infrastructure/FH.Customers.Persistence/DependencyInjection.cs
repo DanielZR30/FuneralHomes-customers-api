@@ -1,14 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using FH.Customers.Application.Abstractions;
-using FH.Customers.Application.CustomerPlans;
+using FH.Customers.Application.UseCases.CustomerPlans;
 using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Persistence.Audit.Repositories;
 using FH.Customers.Persistence.Beneficiaries.Repositories;
 using FH.Customers.Persistence.CustomerPlans;
 using FH.Customers.Persistence.Customers.Repositories;
 using FH.Customers.Persistence.Repositories;
+using FH.Customers.Application.Contracts.Persistence;
 
 namespace FH.Customers.Persistence;
 

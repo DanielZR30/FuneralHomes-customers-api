@@ -1,11 +1,11 @@
 using Moq;
-using FH.Customers.Application.Abstractions;
-using FH.Customers.Application.Beneficiaries.Commands.AddBeneficiary;
-using FH.Customers.Application.Beneficiaries.Commands.RemoveBeneficiary;
+using FH.Customers.Application.UseCases.Beneficiaries.Commands.RemoveBeneficiary;
 using FH.Customers.Domain.Common.ValueObjects;
 using FH.Customers.Domain.Entities;
 using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Domain.Common.Enums;
+using FH.Customers.Application.Contracts.Persistence;
+using FH.Customers.Application.UseCases.Beneficiaries.Commands.AddBeneficiary;
 
 namespace FH.Customers.Tests.Application;
 
