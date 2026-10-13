@@ -20,8 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Core\FH.Customers.Domain\FH.Customers.Domain.csproj" />
-    <ProjectReference Include="..\..\src\Core\FH.Customers.Application\FH.Customers.Application.csproj" />
+    <ProjectReference Include="..\..\src\FH.Customers.Domain\FH.Customers.Domain.csproj" />
+    <ProjectReference Include="..\..\src\FH.Customers.Application\FH.Customers.Application.csproj" />
   </ItemGroup>
 
 </Project>

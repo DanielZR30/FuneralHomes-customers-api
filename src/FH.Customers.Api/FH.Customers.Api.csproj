@@ -16,9 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\FH.Customers.Application\FH.Customers.Application.csproj" />
-    <ProjectReference Include="..\..\Infrastructure\FH.Customers.Persistence\FH.Customers.Persistence.csproj" />
-    <ProjectReference Include="..\..\Infrastructure\FH.Customers.Infrastructure\FH.Customers.Infrastructure.csproj" />
+    <ProjectReference Include="..\FH.Customers.Application\FH.Customers.Application.csproj" />
+    <ProjectReference Include="..\FH.Customers.Persistence\FH.Customers.Persistence.csproj" />
+    <ProjectReference Include="..\FH.Customers.Infrastructure\FH.Customers.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
