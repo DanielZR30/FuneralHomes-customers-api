@@ -1,9 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using CustomerEntity = FH.Customers.Domain.Entities.Customer;
-using FH.Customers.Persistence.Repositories;
 using FH.Customers.Application.Contracts.Repositories;
 
-namespace FH.Customers.Persistence.Customers.Repositories;
+namespace FH.Customers.Persistence.Repositories;
 
 public class CustomerRepository : EfRepository<CustomerEntity, Guid>, ICustomerRepository
 {

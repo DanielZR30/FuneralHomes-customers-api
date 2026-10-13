@@ -1,4 +1,4 @@
-namespace FH.Customers.Persistence.CustomerPlans;
+namespace FH.Customers.Persistence.Seeds;
 
 public interface IDataSeeder
 {

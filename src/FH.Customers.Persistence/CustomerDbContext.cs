@@ -2,8 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using FH.Customers.Domain.Common;
 using FH.Customers.Domain.Entities;
 using FH.Customers.Persistence.Configurations;
-using FH.Customers.Persistence.CustomerPlans;
-using FH.Customers.Persistence.CustomerPlans.Configurations;
+using FH.Customers.Persistence.Seeds;
+using FH.Customers.Persistence.Configurations;
 using FH.Customers.Application.Utilities.Events;
 
 namespace FH.Customers.Persistence;

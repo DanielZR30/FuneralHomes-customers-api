@@ -1,9 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Domain.Entities;
-using FH.Customers.Persistence;
 
-namespace FH.Customers.Persistence.Audit.Repositories;
+namespace FH.Customers.Persistence.Repositories;
 
 public class BeneficiaryAuditLogRepository : IBeneficiaryAuditLogRepository
 {

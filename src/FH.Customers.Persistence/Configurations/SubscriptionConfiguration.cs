@@ -2,11 +2,10 @@ using CustomerEntity = FH.Customers.Domain.Entities.Customer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using FH.Customers.Domain.Common.ValueObjects;
-using FH.Customers.Persistence.CustomerPlans;
 using FH.Customers.Domain.Entities;
 using FH.Customers.Domain.Common.Enums;
 
-namespace FH.Customers.Persistence.CustomerPlans.Configurations;
+namespace FH.Customers.Persistence.Configurations;
 
 public class SubscriptionConfiguration : IEntityTypeConfiguration<Subscription>
 {
