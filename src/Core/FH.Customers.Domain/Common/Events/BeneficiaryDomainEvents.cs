@@ -1,8 +1,7 @@
-
 using FH.Customers.Domain.Common;
-using FH.Customers.Domain.Enums;
+using FH.Customers.Domain.Common.Enums;
 
-namespace FH.Customers.Domain.Events;
+namespace FH.Customers.Domain.Common.Events;
 
 public sealed record BeneficiaryAddedDomainEvent(
     Guid SubscriptionId,

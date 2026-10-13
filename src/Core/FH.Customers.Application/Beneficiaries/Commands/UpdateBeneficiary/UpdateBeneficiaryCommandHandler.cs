@@ -3,7 +3,7 @@ using FH.Customers.Application.Abstractions;
 using FH.Customers.Application.Beneficiaries.DTOs;
 using FH.Customers.Application.Common;
 using FH.Customers.Application.Cqrs;
-using FH.Customers.Domain.Enums;
+using FH.Customers.Domain.Common.Enums;
 using FH.Customers.Domain.Exceptions;
 using FH.Customers.Domain.Repositories;
 

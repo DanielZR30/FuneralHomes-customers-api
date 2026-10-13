@@ -3,8 +3,8 @@ using CustomerEntity = FH.Customers.Domain.Entities.Customer;
 using FH.Customers.Application.Abstractions;
 using FH.Customers.Application.Customers.Commands.CreateCustomer;
 using FH.Customers.Application.Customers.DTOs;
-using FH.Customers.Domain.Enums;
 using FH.Customers.Domain.Repositories;
+using FH.Customers.Domain.Common.Enums;
 
 namespace FH.Customers.Tests.Application;
 

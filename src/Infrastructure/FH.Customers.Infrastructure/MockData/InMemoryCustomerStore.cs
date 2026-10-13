@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
+using FH.Customers.Domain.Common.Enums;
 using FH.Customers.Domain.Common.ValueObjects;
 using FH.Customers.Domain.Entities;
-using FH.Customers.Domain.Enums;
 
 namespace FH.Customers.Infrastructure.MockData;
 

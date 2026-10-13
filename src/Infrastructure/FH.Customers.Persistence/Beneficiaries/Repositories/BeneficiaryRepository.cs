@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using FH.Customers.Domain.Entities;
-using FH.Customers.Domain.Enums;
 using FH.Customers.Persistence;
 using FH.Customers.Domain.Repositories;
+using FH.Customers.Domain.Common.Enums;
 
 namespace FH.Customers.Persistence.Beneficiaries.Repositories;
 

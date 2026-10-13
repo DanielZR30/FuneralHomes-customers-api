@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using FH.Customers.Domain.Common.ValueObjects;
-using FH.Customers.Domain.Enums;
+using FH.Customers.Domain.Common.Enums;
 using FH.Customers.Persistence;
 using FH.Customers.Domain.Entities;
 

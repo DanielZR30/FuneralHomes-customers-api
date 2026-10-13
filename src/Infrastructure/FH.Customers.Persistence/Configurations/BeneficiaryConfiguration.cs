@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using FH.Customers.Domain.Entities;
-using FH.Customers.Domain.Enums;
+using FH.Customers.Domain.Common.Enums;
 
 namespace FH.Customers.Persistence.Configurations;
 

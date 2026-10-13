@@ -1,7 +1,7 @@
 
+using FH.Customers.Domain.Common.Enums;
+using FH.Customers.Domain.Common.Events;
 using FH.Customers.Domain.Entities;
-using FH.Customers.Domain.Enums;
-using FH.Customers.Domain.Events;
 using FH.Customers.Domain.Exceptions;
 
 namespace FH.Customers.Tests.Domain;

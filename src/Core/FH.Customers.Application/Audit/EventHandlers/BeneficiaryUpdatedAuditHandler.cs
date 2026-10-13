@@ -2,8 +2,8 @@
 using FH.Customers.Application.Events;
 using FH.Customers.Domain.Repositories;
 using FH.Customers.Domain.Entities;
-using FH.Customers.Domain.Enums;
-using FH.Customers.Domain.Events;
+using FH.Customers.Domain.Common.Events;
+using FH.Customers.Domain.Common.Enums;
 
 namespace FH.Customers.Application.Audit.EventHandlers;
 

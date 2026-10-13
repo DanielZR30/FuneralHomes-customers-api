@@ -4,7 +4,7 @@ using FH.Customers.Application.Cqrs;
 using FH.Customers.Application.CustomerPlans;
 using FH.Customers.Application.CustomerPlans.Abstractions;
 using FH.Customers.Application.CustomerPlans.DTOs;
-using FH.Customers.Domain.Enums;
+using FH.Customers.Domain.Common.Enums;
 
 namespace FH.Customers.Application.CustomerPlans.Queries.GetSubscriptionCapacity;
 

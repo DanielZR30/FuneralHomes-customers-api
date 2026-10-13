@@ -1,7 +1,7 @@
 
 using FH.Customers.Application.Beneficiaries.DTOs;
 using FH.Customers.Application.Cqrs;
-using FH.Customers.Domain.Enums;
+using FH.Customers.Domain.Common.Enums;
 
 namespace FH.Customers.Application.Beneficiaries.Queries.GetBeneficiariesBySubscription;
 

@@ -6,7 +6,7 @@ using FH.Customers.Application.Customers.DTOs;
 using FH.Customers.Application.Customers.Queries.GetCustomerById;
 using FH.Customers.Application.Customers.Queries.GetCustomerByIdentification;
 using FH.Customers.Application.Customers.Queries.GetCustomers;
-using FH.Customers.Domain.Enums;
+using FH.Customers.Domain.Common.Enums;
 
 namespace FH.Customers.Api.Controllers;
 

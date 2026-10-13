@@ -5,7 +5,7 @@ using FH.Customers.Application.Beneficiaries.Commands.RemoveBeneficiary;
 using FH.Customers.Application.Beneficiaries.Commands.UpdateBeneficiary;
 using FH.Customers.Application.Beneficiaries.DTOs;
 using FH.Customers.Application.Beneficiaries.Queries.GetBeneficiariesBySubscription;
-using FH.Customers.Domain.Enums;
+using FH.Customers.Domain.Common.Enums;
 
 namespace FH.Customers.Api.Controllers;
 

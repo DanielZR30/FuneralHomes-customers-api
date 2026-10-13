@@ -1,4 +1,4 @@
-namespace FH.Customers.Domain.Enums;
+namespace FH.Customers.Domain.Common.Enums;
 
 public enum CustomerType
 {

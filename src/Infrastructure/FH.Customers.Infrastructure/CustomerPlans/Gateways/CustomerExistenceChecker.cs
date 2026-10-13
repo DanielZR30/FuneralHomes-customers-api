@@ -2,9 +2,9 @@ using CustomerEntity = FH.Customers.Domain.Entities.Customer;
 using FH.Customers.Application.CustomerPlans;
 using FH.Customers.Application.CustomerPlans.Abstractions;
 using FH.Customers.Domain.Entities;
-using FH.Customers.Domain.Enums;
 using FH.Customers.Domain.Repositories;
 using FH.Customers.Infrastructure.MockData;
+using FH.Customers.Domain.Common.Enums;
 
 namespace FH.Customers.Infrastructure.CustomerPlans.Gateways;
 

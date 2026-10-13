@@ -1,6 +1,6 @@
 using FH.Customers.Domain.Common;
 
-namespace FH.Customers.Domain.Events;
+namespace FH.Customers.Domain.Common.Events;
 
 public sealed record MaxBeneficiariesUpdated(
     Guid SubscriptionId,

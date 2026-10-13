@@ -1,6 +1,6 @@
 
 using FH.Customers.Domain.Common;
-using FH.Customers.Domain.Enums;
+using FH.Customers.Domain.Common.Enums;
 
 namespace FH.Customers.Domain.Entities;
 

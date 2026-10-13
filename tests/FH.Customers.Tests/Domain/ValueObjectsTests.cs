@@ -1,9 +1,9 @@
 using CustomerEntity = FH.Customers.Domain.Entities.Customer;
 using FH.Customers.Domain.Entities;
-using FH.Customers.Domain.Enums;
 using FH.Customers.Domain.Exceptions;
 using FH.Customers.Domain.Common.ValueObjects;
 using FH.Customers.Domain.Common.ValueObjects;
+using FH.Customers.Domain.Common.Enums;
 
 namespace FH.Customers.Tests.Domain;
 

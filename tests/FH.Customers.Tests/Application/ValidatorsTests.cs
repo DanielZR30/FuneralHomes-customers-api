@@ -4,7 +4,7 @@ using FH.Customers.Application.Beneficiaries.Commands.UpdateBeneficiary;
 using FH.Customers.Application.Customers.Commands.CreateCustomer;
 using FH.Customers.Application.Customers.Commands.UpdateCustomerDemographics;
 using FH.Customers.Application.Customers.Queries.GetCustomerByIdentification;
-using FH.Customers.Domain.Enums;
+using FH.Customers.Domain.Common.Enums;
 
 namespace FH.Customers.Tests.Application;
 

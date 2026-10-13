@@ -1,6 +1,6 @@
 
 using FH.Customers.Application.Cqrs;
-using FH.Customers.Domain.Enums;
+using FH.Customers.Domain.Common.Enums;
 
 namespace FH.Customers.Application.Audit.Commands.RecordAuditLog;
 
