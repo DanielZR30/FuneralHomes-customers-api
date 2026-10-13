@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using static FH.Customers.Application.UseCases.Beneficiaries.DTOs.BeneficiaryResponse;
 using FH.Customers.Application.UseCases.Beneficiaries.Commands.AddBeneficiary;
 using FH.Customers.Application.UseCases.Beneficiaries.Commands.RemoveBeneficiary;
 using FH.Customers.Application.UseCases.Beneficiaries.Commands.UpdateBeneficiary;
 using FH.Customers.Application.UseCases.Beneficiaries.Queries.GetBeneficiariesBySubscription;
 using FH.Customers.Domain.Common.Enums;
 using FH.Customers.Application.UseCases.Beneficiaries.DTOs;
+using FH.Customers.Api.DTOs.Beneficiaries;
 
 namespace FH.Customers.Api.Controllers;
 

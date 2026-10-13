@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using FH.Customers.Api.Requests;
-using FH.Customers.Application.UseCases.CustomerPlans;
 using FH.Customers.Application.UseCases.CustomerPlans.Commands.CancelSubscription;
 using FH.Customers.Application.UseCases.CustomerPlans.Commands.SubscribeCustomer;
 using FH.Customers.Application.UseCases.CustomerPlans.Commands.UpdateMaxBeneficiaries;
@@ -9,6 +7,7 @@ using FH.Customers.Application.UseCases.CustomerPlans.Queries.GetSubscriptionByI
 using FH.Customers.Application.UseCases.CustomerPlans.Queries.GetSubscriptionCapacity;
 using FH.Customers.Application.Utilities.Results;
 using FH.Customers.Application.UseCases.CustomerPlans.DTOs;
+using FH.Customers.Api.DTOs.CustomerPlans;
 
 namespace FH.Customers.Api.Controllers;
 

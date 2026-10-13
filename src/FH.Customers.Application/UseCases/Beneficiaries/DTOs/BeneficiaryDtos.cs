@@ -3,18 +3,6 @@ using FH.Customers.Domain.Entities;
 
 namespace FH.Customers.Application.UseCases.Beneficiaries.DTOs;
 
-public record AddBeneficiaryRequest(
-    SubjectType SubjectType,
-    string FirstName,
-    DateOnly BirthDate,
-    BeneficiaryType BeneficiaryType,
-    RelationshipType RelationshipType,
-    string? LastName = null,
-    string? IdentificationType = null,
-    string? IdentificationNumber = null,
-    string? Email = null,
-    string? Phone = null);
-
 public record BeneficiaryResponse(
     Guid Id,
     Guid SubscriptionId,
@@ -48,13 +36,4 @@ public record BeneficiaryResponse(
             beneficiary.JoinedAt,
             beneficiary.RemovedAt);
 
-
-    public record UpdateBeneficiaryRequest(
-    string FirstName,
-    DateOnly BirthDate,
-    string? LastName = null,
-    string? IdentificationType = null,
-    string? IdentificationNumber = null,
-    string? Email = null,
-    string? Phone = null);
 }

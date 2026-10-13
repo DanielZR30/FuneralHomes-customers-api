@@ -3,23 +3,6 @@ using FH.Customers.Domain.Entities;
 
 namespace FH.Customers.Application.UseCases.Customers.DTOs;
 
-public record CreateCustomerRequest(
-    CustomerType CustomerType,
-    string Name,
-    string IdentificationType,
-    string IdentificationNumber,
-    string? Email,
-    string? Phone,
-    string? Address);
-
-public record UpdateCustomerRequest(
-    string Name,
-    string? Email,
-    string? Phone,
-    string? Address);
-
-public record ChangeCustomerStatusRequest(CustomerStatus Status);
-
 public record CustomerResponse(
     Guid Id,
     string CustomerType,
