@@ -14,40 +14,88 @@ Es el único responsable de los clientes titulares, sus suscripciones a planes y
 
 ## Arquitectura
 
-Una sola Clean Architecture para todo el microservicio. Las capas son **proyectos** y los módulos
-(Customers, CustomerPlans, Beneficiaries, Audit, Messaging) son **carpetas** dentro de cada capa.
-Los namespaces siguen la convención proyecto + carpeta (por ejemplo `FH.Customers.Application.Beneficiaries.Commands.AddBeneficiary`).
+Una sola Clean Architecture para todo el microservicio. Las capas son **proyectos** (planos, dentro de `src/`)
+y los módulos (Customers, CustomerPlans, Beneficiaries, Audit) son **carpetas** dentro de `UseCases`.
+Los namespaces siguen la convención proyecto + carpeta (por ejemplo `FH.Customers.Application.UseCases.Beneficiaries.Commands.AddBeneficiary`).
+La organización de carpetas sigue la del microservicio de referencia de la clase (Inmoby / Properties).
 
 ```text
 src/
-├── Core/
-│   ├── FH.Customers.Domain/            # Entidades, value objects, eventos, excepciones, interfaces de repositorio
-│   └── FH.Customers.Application/       # Casos de uso (CQRS), mediador, validadores, DTOs, Result
-├── Infrastructure/
-│   ├── FH.Customers.Persistence/       # EF Core: CustomerDbContext, configuraciones, repositorios, Unit of Work, migraciones
-│   └── FH.Customers.Infrastructure/    # Adaptadores externos (gateways) publicador de eventos en memoria y datos de ejemplo
-└── Presentation/
-    └── FH.Customers.Api/               # Controllers REST, Program.cs, Swagger
+├── FH.Customers.Domain/            # Entidades, value objects, enums, eventos de dominio, excepciones
+├── FH.Customers.Application/       # Contratos (puertos), casos de uso (CQRS), mediador, validadores, Result
+├── FH.Customers.Persistence/       # EF Core: CustomerDbContext, configuraciones, repositorios, Unit of Work, seeds, migraciones
+├── FH.Customers.Infrastructure/    # Adaptadores a sistemas externos (gateways) y publicador de eventos en memoria
+└── FH.Customers.Api/               # Controllers REST, DTOs de entrada (requests), Program.cs, Swagger
 tests/
-├── FH.Customers.Tests/                 # Dominio, validadores, mediador y handlers
-└── FH.CustomerPlans.Tests/             # Suscripciones
-scripts/                                # smoke-test.ps1, reset-db.ps1
-docs/                                   # ENDPOINTS.md y documentación por módulo
+├── FH.Customers.Tests/             # Dominio, validadores, mediador y handlers
+└── FH.CustomerPlans.Tests/         # Suscripciones
+scripts/                            # smoke-test.ps1, reset-db.ps1
+docs/                               # ENDPOINTS.md y documentación por módulo
 ```
 
 Dependencias (de afuera hacia adentro): `Api → Application, Persistence, Infrastructure`; `Persistence/Infrastructure → Application → Domain`.
 `Domain` no depende de nada.
 
+### Estructura interna de cada capa
+
+```text
+FH.Customers.Domain/
+├── Common/
+│   ├── Enums/                      # Tipos de cliente, estados, parentescos...
+│   ├── Events/                     # Eventos de dominio
+│   └── ValueObjects/               # DocumentId, ContactInfo, Address, MaxBeneficiaries, SubscriptionPeriod
+├── Entities/                       # Customer, Subscription, Member, Beneficiary, BeneficiaryAuditLog
+└── Exceptions/                     # BusinessRuleException
+
+FH.Customers.Application/
+├── Contracts/
+│   ├── Persistence/                # IUnitOfWork
+│   ├── Repositories/               # IRepository y un repositorio por agregado
+│   ├── Gateways/                   # Puertos hacia otros microservicios
+│   └── Messaging/                  # IEventPublisher y eventos de integración
+├── Exceptions/                     # Excepciones de la aplicación
+├── UseCases/
+│   ├── Common/                     # ICommand, IQuery y sus handlers base
+│   └── <Módulo>/                   # Customers, CustomerPlans, Beneficiaries, Audit
+│       ├── Commands/<Caso>/        # Command + Handler + Validator
+│       ├── Queries/<Caso>/         # Query + Handler (+ Validator)
+│       ├── Common/                 # Responses (DTOs de salida) compartidos por el módulo
+│       └── EventHandlers/          # Reacciones a eventos de dominio (solo Audit)
+├── Utilities/                      # Mediator, Results y despacho de eventos de dominio
+└── DependencyInjection.cs          # Registro de la capa (AddApplication)
+
+FH.Customers.Persistence/
+├── Configurations/                 # Mapeo EF Core por entidad
+├── Repositories/                   # Implementaciones de los repositorios
+├── Seeds/                          # Datos iniciales (DataBaseSeeder, CustomerSeeder, SubscriptionSeeder)
+├── UnitOfWorks/                    # UnitOfWork
+├── Migrations/
+├── CustomerDbContext.cs
+└── DependencyInjection.cs          # Registro de la capa (AddPersistence)
+
+FH.Customers.Infrastructure/
+├── CustomerPlans/Gateways/         # Adaptadores hacia Financials y verificación de clientes
+├── Messaging/                      # InMemoryEventPublisher
+└── DependencyInjection.cs          # Registro de la capa (AddInfrastructure)
+
+FH.Customers.Api/
+├── Controllers/                    # Un controller por módulo
+├── DTOs/<Módulo>/                  # Requests (DTOs de entrada) de cada módulo
+├── Properties/launchSettings.json
+└── Program.cs
+```
+
 ### Patrones aplicados
 
 | Patrón | Dónde |
 |---|---|
-| **CQRS** | `Application/<Módulo>/Commands` y `Queries`: cada caso de uso tiene Command/Query, Handler y Validator |
-| **Mediator propio** | `Application/Mediator`: `IMediator`, `SimpleMediator`, `IRequest`, `IRequestHandler`; resuelve el Handler por reflexión y ejecuta los validadores antes |
+| **CQRS** | `Application/UseCases/<Módulo>/Commands` y `Queries`: cada caso de uso tiene Command/Query, Handler y Validator |
+| **Mediator propio** | `Application/Utilities/Mediator`: `IMediator`, `SimpleMediator`, `IRequest`, `IRequestHandler`; resuelve el Handler por reflexión y ejecuta los validadores antes |
 | **FluentValidation** | Un `Validator` por caso de uso, ejecutado por el mediador (devuelve 400 sin llegar al Handler) |
 | **Value Objects** | `DocumentId`, `ContactInfo`, `Address` (Customer y Member) y `MaxBeneficiaries`, `SubscriptionPeriod` (Subscription) |
-| **Repository** | Interfaces en `Domain/<Módulo>/Repositories`, implementación EF Core en `Persistence` |
-| **Unit of Work** | `IUnitOfWork` (`CommitAsync`/`RollbackAsync`) en Application; implementación única en Persistence |
+| **Repository** | Interfaces en `Application/Contracts/Repositories`, implementación EF Core en `Persistence/Repositories` |
+| **Unit of Work** | `IUnitOfWork` (`CommitAsync`/`RollbackAsync`) en `Application/Contracts/Persistence`; implementación única en `Persistence/UnitOfWorks` |
+| **DTOs** | Requests (entrada) en `Api/DTOs/<Módulo>`; Responses (salida) en `Application/UseCases/<Módulo>/Common`. El controller arma el Command desde el request |
 | **Eventos de dominio** | Las entidades generan eventos; `DomainEventDispatcher` los entrega a sus manejadores (auditoría) antes de guardar |
 | **Result** | Los Handlers devuelven `Result`/`Result<T>` con código HTTP; el controller lo traduce a la respuesta |
 
@@ -65,14 +113,15 @@ docker run --name fh-pg -e POSTGRES_PASSWORD=secret -p 5432:5432 -d postgres:16
 .\scripts\reset-db.ps1
 
 # 3. Ejecutar la API (abre Swagger en https://localhost:7035/swagger)
-dotnet run --project src/Presentation/FH.Customers.Api --launch-profile https
+dotnet run --project src/FH.Customers.Api --launch-profile https
 
 # 4. Pruebas unitarias y prueba de todos los endpoints (con la API corriendo)
 dotnet test
 .\scripts\smoke-test.ps1
 ```
 
-La cadena de conexión está en `src/Presentation/FH.Customers.Api/appsettings.json` (`ConnectionStrings:CustomerDb`).
+La cadena de conexión está en `src/FH.Customers.Api/appsettings.json` (`ConnectionStrings:CustomerDb`).
+En Development, al arrancar la API se siembran un cliente y una suscripción de ejemplo (`DataBaseSeeder`), solo si las tablas están vacías.
 Si PowerShell bloquea los scripts: `Set-ExecutionPolicy -Scope Process Bypass`.
 
 ---

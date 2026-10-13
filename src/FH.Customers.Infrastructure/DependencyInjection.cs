@@ -4,7 +4,6 @@ using FH.Customers.Application.UseCases.CustomerPlans;
 using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Infrastructure.CustomerPlans.Gateways;
 using FH.Customers.Infrastructure.Messaging;
-using FH.Customers.Infrastructure.MockData;
 using FH.Customers.Application.Contracts.Gateways;
 using FH.Customers.Application.Contracts.Messaging;
 
@@ -13,16 +12,13 @@ namespace FH.Customers.Infrastructure;
 public static class DependencyInjection
 {
     /// <summary>
-    /// Registra la capa Infrastructure: adaptadores a sistemas externos (gateways), almacén mock
-    /// en memoria y el publicador de eventos (en memoria por ahora; Kafka pendiente).
+    /// Registra la capa Infrastructure: adaptadores a sistemas externos (gateways)
+    /// y el publicador de eventos (en memoria por ahora; Kafka pendiente).
     /// </summary>
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
         IConfiguration? configuration = null)
     {
-        // Almacén Mock en memoria (permite probar la API sin PostgreSQL levantado)
-        services.AddSingleton<InMemoryCustomerStore>();
-
         // Gateways y adaptadores de puertos
         services.AddScoped<ICustomerExistenceChecker, CustomerExistenceChecker>();
         services.AddScoped<IFinancialsPlanGateway, FinancialsPlanGatewayStub>();

@@ -1,19 +1,16 @@
 # Arquitectura del Microservicio Customers (Clean Architecture)
 
 Una sola Clean Architecture para todo el microservicio. Los **módulos** (Customers, CustomerPlans,
-Beneficiaries, Audit, Messaging) son **carpetas dentro de cada capa**, no proyectos aparte.
+Beneficiaries, Audit) son **carpetas dentro de `UseCases`** y de `Api/DTOs`, no proyectos aparte.
 Las dependencias apuntan hacia adentro: `Api → Application → Domain`.
 
 ```text
 src/
-├── Core/
-│   ├── FH.Customers.Domain/            # Entidades, enums, value objects, eventos, excepciones, interfaces de repositorio
-│   └── FH.Customers.Application/       # Casos de uso: Commands/Queries (CQRS con mediador propio (`IMediator`/`SimpleMediator`, con FluentValidation integrado)), DTOs, handlers, validadores
-├── Infrastructure/
-│   ├── FH.Customers.Persistence/       # EF Core: DbContexts, configuraciones, migraciones, repositorios, Unit of Work
-│   └── FH.Customers.Infrastructure/    # Adaptadores externos: gateways, mock en memoria, (Kafka pendiente)
-└── Presentation/
-    └── FH.Customers.Api/               # Controllers REST, Program.cs, Swagger, appsettings
+├── FH.Customers.Domain/            # Entidades, value objects, enums, eventos de dominio, excepciones
+├── FH.Customers.Application/       # Contratos (puertos), casos de uso CQRS con mediador propio (`IMediator`/`SimpleMediator`, con FluentValidation integrado), validadores
+├── FH.Customers.Persistence/       # EF Core: DbContext, configuraciones, migraciones, repositorios, Unit of Work, seeds
+├── FH.Customers.Infrastructure/    # Adaptadores externos: gateways y publicador de eventos en memoria (Kafka pendiente)
+└── FH.Customers.Api/               # Controllers REST, DTOs de entrada, Program.cs, Swagger, appsettings
 tests/
 ├── FH.Customers.Tests/
 └── FH.CustomerPlans.Tests/
@@ -37,15 +34,15 @@ tests/
 | Audit | [Audit.md](Audit.md) |
 | Messaging | [Messaging.md](Messaging.md) |
 
-> Convención de namespaces (igual que Inmoby): **proyecto + carpeta**. Ejemplo: `FH.Customers.Application.Beneficiaries.Commands.AddBeneficiary`
-> está en `FH.Customers.Application/Beneficiaries/Commands/AddBeneficiary/`. Los documentos de cada módulo se escribieron antes de la
-> reorganización; si mencionan `FH.Shared`, `FH.Modules.*` o `src/2.Modules/...`, el código ahora está en la carpeta del módulo dentro de cada proyecto.
+> Convención de namespaces (igual que el microservicio de referencia de la clase, Inmoby): **proyecto + carpeta**. Ejemplo:
+> `FH.Customers.Application.UseCases.Beneficiaries.Commands.AddBeneficiary` está en
+> `src/FH.Customers.Application/UseCases/Beneficiaries/Commands/AddBeneficiary/`.
 
 ## Migraciones (un solo DbContext: `CustomerDbContext`, en `FH.Customers.Persistence`)
 
 ```bash
-dotnet ef migrations add <Nombre> --project src/Infrastructure/FH.Customers.Persistence --startup-project src/Presentation/FH.Customers.Api
-dotnet ef database update         --project src/Infrastructure/FH.Customers.Persistence --startup-project src/Presentation/FH.Customers.Api
+dotnet ef migrations add <Nombre> --project src/FH.Customers.Persistence --startup-project src/FH.Customers.Api
+dotnet ef database update         --project src/FH.Customers.Persistence --startup-project src/FH.Customers.Api
 ```
 
 ### Primera vez tras los value objects

@@ -1,4 +1,4 @@
-# Módulo de Customer Plans (`FH.Modules.CustomerPlans`)
+# Módulo de Customer Plans (`CustomerPlans`)
 
 Este módulo forma parte del microservicio **Customers** (`fh.api.customer`) y está enfocado en la administración de **suscripciones a planes funerarios y control estricto de cupos**.
 
@@ -6,7 +6,7 @@ Este módulo forma parte del microservicio **Customers** (`fh.api.customer`) y e
 
 ## 1. Responsabilidades del Módulo
 
-El módulo `FH.Modules.CustomerPlans` es el responsable de gobernar el vínculo contractual entre un titular y un plan de previsión funeraria:
+El módulo `CustomerPlans` es el responsable de gobernar el vínculo contractual entre un titular y un plan de previsión funeraria:
 
 1. **Gestión del Ciclo de Vida de Suscripciones**:
    - Creación, activación, suspensión, cancelación y expiración de suscripciones (`customer_subscriptions`).
@@ -19,7 +19,7 @@ El módulo `FH.Modules.CustomerPlans` es el responsable de gobernar el vínculo 
 4. **Vínculo con Microservicios Externos (Financials)**:
    - Mantener la referencia desacoplada al plan del catálogo comercial mediante el identificador externo `external_plan_id` (perteneciente a `fh.api.financial`).
 5. **Servicio Interno de Validación de Elegibilidad**:
-   - Proveer contratos y consultas rápidas para que el módulo de Beneficiarios (`FH.Modules.Beneficiaries`) verifique que la suscripción está activa y dispone de cupos libres antes de incorporar miembros.
+   - Proveer contratos y consultas rápidas para que el módulo de Beneficiarios (`Beneficiaries`) verifique que la suscripción está activa y dispone de cupos libres antes de incorporar miembros.
 
 ---
 
@@ -104,7 +104,7 @@ El módulo `FH.Modules.CustomerPlans` es el responsable de gobernar el vínculo 
 ---
 
 ### HU-PLN-05: Validación de Elegibilidad y Disponibilidad de Cupo
-* **Como** Módulo interno de Beneficiarios (`FH.Modules.Beneficiaries`),  
+* **Como** Módulo interno de Beneficiarios (`Beneficiaries`),  
 * **Quiero** verificar si una suscripción está activa y tiene al menos un cupo disponible,  
 * **Para** autorizar o rechazar la admisión de un nuevo sujeto cubierto.
 
@@ -119,30 +119,41 @@ El módulo `FH.Modules.CustomerPlans` es el responsable de gobernar el vínculo 
 ## 3. Explicación Técnica y Arquitectura
 
 ### 3.1 Estructura Interna del Módulo (DDD)
-Ubicación: `carpeta CustomerPlans en Domain / Application / Persistence`
+Ubicación: módulo `CustomerPlans` dentro de `Domain`, `Application`, `Persistence`, `Infrastructure` y `Api`
 
 ```text
-FH.Modules.CustomerPlans/
-├── domain/                      # Lógica de dominio de suscripciones
-│   ├── Entities/                # CustomerSubscription (AggregateRoot<Guid>)
+Domain/
+├── Entities/                    # Subscription (AggregateRoot<Guid>)
+├── Common/
 │   ├── Enums/                   # SubscriptionStatus
-│   ├── Repositories/            # ICustomerSubscriptionRepository
-│   └── Exceptions/              # SubscriptionLimitExceededException, SubscriptionNotActiveException
-│
-├── application/                 # Casos de uso
-│   ├── Commands/
-│   │   ├── SubscribeCustomer/   # Command, Handler, Validator
-│   │   ├── CancelSubscription/  # Command, Handler
-│   │   └── UpdateCapacity/      # Command, Handler
-│   ├── Queries/
-│   │   ├── GetCustomerSubscriptions/
-│   │   └── GetSubscriptionById/
-│   └── Services/                # ISubscriptionEligibilityService
-│
-├── infrastructure/              # Persistencia con EF Core
-│   └── Repositories/            # CustomerSubscriptionRepository
-│
-└── README.md                    # Este archivo
+│   ├── Events/                  # SubscriptionCreated, SubscriptionCancelled, MaxBeneficiariesUpdated
+│   └── ValueObjects/            # MaxBeneficiaries, SubscriptionPeriod
+└── Exceptions/                  # BusinessRuleException
+
+Application/
+├── Contracts/
+│   ├── Repositories/            # ISubscriptionRepository
+│   └── Gateways/                # IFinancialsPlanGateway, ICustomerExistenceChecker, IAssignedBeneficiariesCounter
+└── UseCases/CustomerPlans/
+    ├── Commands/
+    │   ├── SubscribeCustomer/        # Command, Handler, Validator
+    │   ├── CancelSubscription/       # Command, Handler, Validator
+    │   └── UpdateMaxBeneficiaries/   # Command, Handler, Validator
+    ├── Queries/
+    │   ├── GetCustomerSubscriptions/
+    │   ├── GetSubscriptionById/
+    │   └── GetSubscriptionCapacity/
+    └── Common/                  # SubscriptionDto, SubscriptionCapacityDto
+
+Persistence/
+├── Configurations/              # SubscriptionConfiguration
+└── Repositories/                # SubscriptionRepository
+
+Infrastructure/CustomerPlans/Gateways/   # Adaptadores: CustomerExistenceChecker, FinancialsPlanGatewayStub, AssignedBeneficiariesCounterStub
+
+Api/
+├── Controllers/                 # SubscriptionsController
+└── DTOs/CustomerPlans/          # CreateSubscriptionRequest, UpdateMaxBeneficiariesRequest
 ```
 
 ### 3.2 Modelo de Base de Datos (`customer_subscriptions`)

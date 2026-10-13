@@ -1,4 +1,4 @@
-# Módulo de Auditoría (`FH.Modules.Audit`)
+# Módulo de Auditoría (`Audit`)
 
 Este módulo forma parte del microservicio **Customers** (`fh.api.customer`) y está diseñado para garantizar la **trazabilidad inmutable de novedades** y actuar como la base del patrón **Transactional Outbox** para la publicación confiable de eventos asíncronos hacia Apache Kafka.
 
@@ -6,7 +6,7 @@ Este módulo forma parte del microservicio **Customers** (`fh.api.customer`) y e
 
 ## 1. Responsabilidades del Módulo
 
-El módulo `FH.Modules.Audit` tiene la responsabilidad exclusiva de registrar y consultar todo cambio que impacte el grupo de beneficiarios y las suscripciones:
+El módulo `Audit` tiene la responsabilidad exclusiva de registrar y consultar todo cambio que impacte el grupo de beneficiarios y las suscripciones:
 
 1. **Registro Inmutable de Novedades (Audit Trail)**:
    - Registrar de forma no modificable cada acción sobre beneficiarios:
@@ -97,25 +97,29 @@ El módulo `FH.Modules.Audit` tiene la responsabilidad exclusiva de registrar y 
 Ubicación: `carpeta Audit en Domain / Application / Persistence`
 
 ```text
-FH.Modules.Audit/
-├── domain/                      # Lógica inmutable de auditoría
-│   ├── Entities/                # BeneficiaryAuditLog (Entity<Guid>)
-│   ├── Enums/                   # AuditAction (BeneficiaryAdded, BeneficiaryRemoved, BeneficiaryUpdated)
-│   └── Repositories/            # IBeneficiaryAuditLogRepository
-│
-├── application/                 # Casos de uso y Event Handlers
-│   ├── Commands/
-│   │   ├── RecordAuditLog/      # Command, Handler
-│   │   └── MarkAsPublished/     # Command, Handler
-│   ├── Queries/
-│   │   ├── GetSubscriptionAuditLog/
-│   │   └── GetUnpublishedAuditLogs/ # Usado por el Outbox Worker
-│   └── EventHandlers/           # Handlers que escuchan BeneficiaryAddedDomainEvent
-│
-├── infrastructure/              # Repositorio EF Core
-│   └── Repositories/            # BeneficiaryAuditLogRepository
-│
-└── README.md                    # Este archivo
+Domain/
+├── Entities/                    # BeneficiaryAuditLog
+└── Common/Enums/                # AuditAction (BeneficiaryAdded, BeneficiaryRemoved, BeneficiaryUpdated)
+
+Application/
+├── Contracts/Repositories/      # IBeneficiaryAuditLogRepository
+└── UseCases/Audit/
+    ├── Commands/
+    │   ├── RecordAuditLog/      # Command, Handler
+    │   └── MarkAsPublished/     # Command, Handler
+    ├── Queries/
+    │   ├── GetSubscriptionAuditLog/
+    │   ├── GetMemberAuditLog/
+    │   └── GetUnpublishedAuditLogs/   # Usado por el Outbox Worker
+    ├── EventHandlers/           # Escuchan BeneficiaryAdded / Removed / Updated (eventos de dominio)
+    └── Common/                  # AuditLogResponse
+
+Persistence/
+├── Configurations/              # BeneficiaryAuditLogConfiguration
+└── Repositories/                # BeneficiaryAuditLogRepository
+
+Api/
+└── Controllers/                 # AuditController
 ```
 
 ### 3.2 Modelo de Base de Datos (`beneficiary_audit_log`)
@@ -159,7 +163,7 @@ CREATE INDEX idx_audit_member ON beneficiary_audit_log(member_id);
    await transaction.CommitAsync();
    ```
 2. **Despacho Desacoplado**:
-   El módulo de mensajería (`FH.Modules.Messaging`) procesa los registros con `event_published = false` y los publica a Kafka sin bloquear la respuesta HTTP al usuario.
+   El módulo de mensajería (`Messaging`) procesa los registros con `event_published = false` y los publica a Kafka sin bloquear la respuesta HTTP al usuario.
 
 ### 3.4 Contratos y Endpoints REST
 

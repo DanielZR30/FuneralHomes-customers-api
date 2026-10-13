@@ -1,4 +1,4 @@
-# Módulo de Customer (`FH.Modules.Customer`)
+# Módulo de Customer (`Customers`)
 
 Módulo del microservicio **Customers** (`fh.api.customer`).Gobierna el ciclo de vida demográfico, legal y de contacto de los clientes titulares de planes funerarios, bajo **DDD**, **Clean Architecture** y **CQRS** con mediador propio.
 
@@ -11,7 +11,7 @@ Módulo del microservicio **Customers** (`fh.api.customer`).Gobierna el ciclo de
 3. **Mantenimiento demográfico y de contacto**: actualización de nombre, correo, teléfono y dirección.
 4. **Gobierno del ciclo de vida**: control de las transiciones `Active`, `Suspended` e `Inactive`.
 
-La entidad de dominio y su configuración de persistencia viven en `FH.Shared` (`FH.Shared.Domain.Entities.Customer`), porque `CustomerDbContext` es compartido con los módulos de Suscripciones y Planes. El módulo aporta el **caso de uso**; el núcleo conserva el **modelo**.
+La entidad `Customer` vive en `Domain/Entities`, su mapeo en `Persistence/Configurations` y los casos de uso en `Application/UseCases/Customers`.
 
 ---
 
@@ -35,33 +35,36 @@ Normalización aplicada en el límite de datos (`CustomerRepository`): el tipo d
 ## 3. Estructura real del módulo
 
 ```text
-FH.Modules.Customer/
-├── domain/
-│   └── Repositories/
-│       └── ICustomerRepository.cs      # Contrato especializado (varias operaciones de lectura)
-├── application/
-│   ├── DTOs/
-│   │   └── CustomerDtos.cs             # Requests y Responses
-│   ├── Commands/
-│   │   ├── CreateCustomer/             # Command + Handler  -> 201
-│   │   ├── UpdateCustomerDemographics/ # Command + Handler  -> 200
-│   │   └── ChangeCustomerStatus/       # Command + Handler  -> 204
-│   └── Queries/
-│       ├── GetCustomerById/            # Query + Handler    -> 200
-│       ├── GetCustomerByIdentification/# Query + Handler    -> 200
-│       └── GetCustomers/               # Query + Handler    -> 200
-├── infrastructure/
-│   ├── Repositories/
-│   │   └── CustomerRepository.cs       # Adaptador EF Core sobre CustomerDbContext
-│   └── Endpoints/
-│       └── CustomerEndpoints.cs        # Capa HTTP fina, sin lógica de negocio
-└── Extensions/
-    └── CustomerModuleExtensions.cs     # Registro de DI
+Domain/
+├── Entities/                    # Customer
+└── Common/ValueObjects/         # DocumentId, ContactInfo, Address
+
+Application/
+├── Contracts/Repositories/      # ICustomerRepository (contrato especializado de lectura)
+└── UseCases/Customers/
+    ├── Commands/
+    │   ├── CreateCustomer/               # Command + Handler + Validator  -> 201
+    │   ├── UpdateCustomerDemographics/   # Command + Handler + Validator  -> 200
+    │   └── ChangeCustomerStatus/         # Command + Handler + Validator  -> 204
+    ├── Queries/
+    │   ├── GetCustomerById/              # Query + Handler  -> 200
+    │   ├── GetCustomerByIdentification/  # Query + Handler + Validator  -> 200
+    │   └── GetCustomers/                 # Query + Handler  -> 200
+    └── Common/                  # CustomerResponse (DTO de salida)
+
+Persistence/
+├── Configurations/              # CustomerConfiguration
+├── Repositories/                # CustomerRepository (adaptador EF Core sobre CustomerDbContext)
+└── Seeds/                       # CustomerSeeder (cliente demo en Development)
+
+Api/
+├── Controllers/                 # CustomersController (capa HTTP fina, sin lógica de negocio)
+└── DTOs/Customers/              # CreateCustomerRequest, UpdateCustomerRequest, ChangeCustomerStatusRequest
 ```
 
 **Decisiones de diseño relevantes**
 
-- **Sin FluentValidation.** La validación se hace con `Result<T>` (`FH.Shared`) en los handlers, siguiendo el patrón vigente de `FH.Modules.Beneficiaries`. Incorporar FluentValidation aquí sería una decisión de arquitectura que afecta a toda la solución y debe tomarla el equipo, no este módulo.
+- **FluentValidation por caso de uso.** Cada Command/Query tiene su `Validator`, que el mediador ejecuta antes del Handler; si falla responde `400` sin llegar a la lógica.
 - **Normalización en el repositorio, no en los handlers.** Así ningún llamador puede omitirla; los handlers solo orquestan y traducen errores.
 - **Sin excepciones propias.** Los handlers devuelven `Result<T>` con el código HTTP ya resuelto; la capa HTTP solo serializa.
 - **`Inactive` es terminal en el dominio.** La transición se rechaza en `Customer.Deactivate/Suspend/Activate`.
@@ -79,7 +82,7 @@ FH.Modules.Customer/
 | `PUT` | `/api/v1/customers/{id}` | Actualizar datos de contacto y nombre | `200` | `400`, `404` |
 | `PATCH` | `/api/v1/customers/{id}/status` | Cambiar estado | `204` | `400`, `404`, `409` |
 
-Ejemplos listos para ejecutar en [`FH.Customers.Api.http`](../../src/Presentation/FH.Customers.Api/FH.Customers.Api.http), que cubre los casos felices y **todos** los errores de dominio. Swagger disponible en `/swagger` con la especificación OpenAPI 3.
+Ejemplos listos para ejecutar en [`FH.Customers.Api.http`](../../src/FH.Customers.Api/FH.Customers.Api.http), que cubre los casos felices y **todos** los errores de dominio. Swagger disponible en `/swagger` con la especificación OpenAPI 3.
 
 ---
 
@@ -89,37 +92,18 @@ Ejemplos listos para ejecutar en [`FH.Customers.Api.http`](../../src/Presentatio
 dotnet test FuneralHomes.Customers.slnx
 ```
 
-**36 pruebas, todas en verde.** Suite en `tests/FH.Modules.Customer.Tests`:
+**36 pruebas, todas en verde.** Suite en `tests/FH.Customers.Tests`:
 
 - `Domain/CustomerEntityTests.cs`: normalización, estado inicial y transiciones de la entidad.
 - `Application/CreateCustomerCommandHandlerTests.cs`: creación, duplicado (RN-03), campos obligatorios y traducción de `DbUpdateException`.
 - `Application/UpdateAndChangeStatusCommandHandlerTests.cs`: actualización e inmutabilidad (RN-05), idempotencia (RN-06) y terminalidad (RN-07).
 - `Application/QueriesHandlerTests.cs`: consulta por id y por identificación, y listado con filtro.
 
-Además de las pruebas unitarias, los seis endpoints se verificaron end-to-end contra PostgreSQL 16 con la migración `20261003181200_InitialCreate` aplicada, confirmando los códigos de la tabla anterior y las ocho reglas de negocio.
+Además de las pruebas unitarias, los seis endpoints se verificaron end-to-end contra PostgreSQL 16 con la migración `InitialCreate` aplicada, confirmando los códigos de la tabla anterior y las ocho reglas de negocio.
 
 ---
 
-## 6. Pendiente de decisión del equipo
+## 6. Estado actual y pendientes
 
-> **Discrepancia entre RN-03 y el índice en base de datos.**
-> `CustomerConfiguration` declara `IX_customers_identification_number` como `UNIQUE` **solo sobre `identification_number`**, mientras que RN-03 define la unicidad sobre la pareja `(identification_type, identification_number)`.
->
-> Consecuencia verificada: un cliente `Corporate` con `NIT = 555000111` es rechazado con `409` si ya existe un `Individual` con `CC = 555000111`. La base de datos es **más estricta** que la regla de negocio.
->
-> `CreateCustomerCommandHandler` mitiga el efecto: valida la pareja antes de insertar y traduce un `DbUpdateException` del índice a `409`, de modo que nunca se filtra un `500`. Aun así, **el módulo no puede registrar una combinación legítimamente válida** hasta que se corrija el índice.
->
-> Corrección propuesta (una sola migración):
->
-> ```sql
-> DROP INDEX IX_customers_identification_number;
-> CREATE UNIQUE INDEX IX_customers_identification
->     ON customers (identification_type, identification_number);
-> ```
->
-> No se aplicó porque `FH.Shared` es base compartida y la migración afectaría a los módulos de Suscripciones y Planes.
-
-### Otros puntos a alinear antes de integrar
-
-- **`Program.cs` y `FuneralHomes.Customers.slnx`**: el PR abierto de `customer-plans` (#3) modifica las mismas líneas. Al integrar hay que conservar los ensamblados y proyectos de prueba de ambos módulos.
-- **`GET /api/v1/customers` no pagina**: usa el almacén en memoria compartido. Con volumen real conviene añadir paginación y filtro por texto antes de exponerlo a clientes externos.
+- **Unicidad de la identificación (RN-03):** el índice único de `customers` es compuesto sobre `(identification_type, identification_number)`, de modo que un `NIT` y una `CC` con el mismo número son clientes distintos. El `CreateCustomerCommandHandler` valida la pareja antes de insertar y traduce un `DbUpdateException` del índice a `409`.
+- **`GET /api/v1/customers` no pagina:** devuelve todos los clientes (con filtro opcional por estado). Con volumen real conviene añadir paginación y filtro por texto antes de exponerlo a clientes externos.

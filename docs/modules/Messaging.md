@@ -1,4 +1,4 @@
-# Módulo de Mensajería e Integraciones (`FH.Modules.Messaging`)
+# Módulo de Mensajería e Integraciones (`Messaging`)
 
 Este módulo forma parte de la arquitectura del microservicio **Customers** (`fh.api.customer`) y es el componente encargado de la **comunicación asíncrona orientada a eventos (*Event-Driven Architecture*)** mediante **Apache Kafka**.
 
@@ -6,7 +6,7 @@ Este módulo forma parte de la arquitectura del microservicio **Customers** (`fh
 
 ## 1. Responsabilidades del Módulo
 
-El módulo `FH.Modules.Messaging` es responsable de conectar el dominio de Customers con el resto del ecosistema de la plataforma Funeral Homes:
+El módulo `Messaging` es responsable de conectar el dominio de Customers con el resto del ecosistema de la plataforma Funeral Homes:
 
 1. **Publicación Confiable de Eventos en Apache Kafka**:
    - Serializar y enviar eventos de integración a los tópicos correspondientes con semántica *at-least-once*.
@@ -88,27 +88,20 @@ El módulo `FH.Modules.Messaging` es responsable de conectar el dominio de Custo
 ## 3. Explicación Técnica y Arquitectura
 
 ### 3.1 Estructura Interna del Módulo
-Ubicación: `carpeta Messaging en Application / Infrastructure`
+Ubicación: `Application/Contracts/Messaging` e `Infrastructure/Messaging`
 
 ```text
-FH.Modules.Messaging/
-├── Domain/
-│   └── Events/                  # Contratos de eventos de integración
-│       ├── BeneficiaryAddedIntegrationEvent.cs
-│       └── BeneficiaryRemovedIntegrationEvent.cs
-│
-├── Application/
-│   ├── IEventPublisher.cs       # Abstracción para publicación de eventos
-│   └── IOutboxDispatcher.cs     # Contrato para el despachador
-│
-├── Infrastructure/              # Adaptadores de Kafka
-│   ├── Kafka/
-│   │   ├── KafkaEventPublisher.cs   # Implementación con Confluent.Kafka
-│   │   └── KafkaProducerFactory.cs  # Configuración de ProducerConfig
-│   └── BackgroundServices/
-│       └── OutboxDispatcherWorker.cs # BackgroundService de .NET
-│
-└── README.md                    # Este archivo
+Application/Contracts/Messaging/
+├── IEventPublisher.cs                      # Puerto para publicar eventos
+└── Events/
+    └── BeneficiaryAddedIntegrationEvent.cs # Contrato del evento de integración
+
+Infrastructure/Messaging/
+└── InMemoryEventPublisher.cs               # Implementación actual: registra el evento en el log
+
+Pendiente (diseño objetivo con Kafka, aún no implementado):
+├── Infrastructure/Messaging/Kafka/KafkaEventPublisher.cs    # Implementación con Confluent.Kafka
+└── Infrastructure/Messaging/OutboxDispatcherWorker.cs       # BackgroundService que publica los eventos de auditoría no enviados
 ```
 
 ### 3.2 Contrato JSON del Evento Kafka

@@ -1,4 +1,4 @@
-# Módulo de Beneficiarios (`FH.Modules.Beneficiaries`)
+# Módulo de Beneficiarios (`Beneficiaries`)
 
 Este módulo forma parte del microservicio **Customers** (`fh.api.customer`) y es el núcleo operativo que gestiona a los **sujetos cubiertos** (personas naturales y mascotas) y sus vínculos contractuales como beneficiarios de una suscripción de previsión exequial.
 
@@ -6,7 +6,7 @@ Este módulo forma parte del microservicio **Customers** (`fh.api.customer`) y e
 
 ## 1. Responsabilidades del Módulo
 
-El módulo `FH.Modules.Beneficiaries` es responsable de la administración de la cobertura familiar y de dependientes:
+El módulo `Beneficiaries` es responsable de la administración de la cobertura familiar y de dependientes:
 
 1. **Gestión Unificada de Miembros (`Member`)**:
    - Registro de sujetos individuales cubiertos: seres humanos (`HUMAN`) y mascotas (`PET`).
@@ -152,31 +152,34 @@ El módulo `FH.Modules.Beneficiaries` es responsable de la administración de la
 ## 3. Explicación Técnica y Arquitectura
 
 ### 3.1 Estructura Interna del Módulo (DDD)
-Ubicación: `carpeta Beneficiaries en Domain / Application / Persistence`
+Ubicación: módulo `Beneficiaries` dentro de `Domain`, `Application`, `Persistence` y `Api`
 
 ```text
-FH.Modules.Beneficiaries/
-├── domain/                      # Entidades y servicios de dominio
-│   ├── Entities/                # Member, Beneficiary
+Domain/
+├── Entities/                    # Member, Beneficiary
+├── Common/
 │   ├── Enums/                   # SubjectType, BeneficiaryType, RelationshipType, BeneficiaryStatus
-│   ├── Services/                # AgeCalculationService
-│   ├── Events/                  # BeneficiaryAddedDomainEvent, BeneficiaryRemovedDomainEvent
-│   ├── Repositories/            # IMemberRepository, IBeneficiaryRepository
-│   └── Exceptions/              # BeneficiaryCapacityExceededException, DuplicateBeneficiaryException
-│
-├── application/                 # Casos de uso
-│   ├── Commands/
-│   │   ├── AddBeneficiary/      # Command, Handler, Validator
-│   │   └── RemoveBeneficiary/   # Command, Handler
-│   ├── Queries/
-│   │   ├── GetBeneficiariesBySubscription/
-│   │   └── GetMemberById/
-│   └── DTOs/                    # BeneficiaryResponseDto, MemberDto, AddBeneficiaryRequestDto
-│
-├── infrastructure/              # Repositorios EF Core
-│   └── Repositories/            # MemberRepository, BeneficiaryRepository
-│
-└── README.md                    # Este archivo
+│   └── Events/                  # BeneficiaryAdded / Removed / Updated (eventos de dominio)
+└── Exceptions/                  # BusinessRuleException
+
+Application/
+├── Contracts/Repositories/      # IBeneficiaryRepository
+└── UseCases/Beneficiaries/
+    ├── Commands/
+    │   ├── AddBeneficiary/      # Command, Handler, Validator
+    │   ├── UpdateBeneficiary/   # Command, Handler, Validator
+    │   └── RemoveBeneficiary/   # Command, Handler, Validator
+    ├── Queries/
+    │   └── GetBeneficiariesBySubscription/   # Query, Handler
+    └── Common/                  # BeneficiaryResponse (DTO de salida compartido)
+
+Persistence/
+├── Configurations/              # MemberConfiguration, BeneficiaryConfiguration
+└── Repositories/                # BeneficiaryRepository
+
+Api/
+├── Controllers/                 # BeneficiariesController
+└── DTOs/Beneficiaries/          # AddBeneficiaryRequest, UpdateBeneficiaryRequest
 ```
 
 ### 3.2 Modelo de Base de Datos (`members` y `beneficiaries`)
@@ -276,7 +279,7 @@ O para una mascota:
 - Colección de endpoints con casos exitosos y de error en `docs/ENDPOINTS.md`.
 
 **Diferencias respecto al diseño inicial**
-- `Member`, `Beneficiary`, los eventos, `DerivedAgeCalculator` y `BusinessRuleException` viven en `FH.Shared`, no dentro del módulo.
+- `Member` y `Beneficiary` viven en `Domain/Entities`, los eventos en `Domain/Common/Events` y `BusinessRuleException` en `Domain/Exceptions`. El cálculo de la edad derivada es un método privado de `Member` (solo esa entidad lo usa).
 - No hay `IMemberRepository`, validadores FluentValidation ni consulta `GetMemberById`: las validaciones están en el dominio y en los handlers.
 - Los duplicados se detectan por documento y no por `memberId`, porque cada alta crea un `Member` nuevo.
 - La actualización solo modifica datos del miembro: el tipo de sujeto y el parentesco no cambian.
