@@ -47,6 +47,19 @@ public class ValidatorsTests
         Assert.Contains(result.Errors, e => e.PropertyName == property);
     }
 
+    [Theory]
+    [InlineData("XYZ")]
+    [InlineData("CEDULA")]
+    public void CreateCustomer_WhenIdentificationTypeIsNotAllowed_ShouldFail(string type)
+    {
+        // C4: solo CC, CE, TI, RC, PA y NIT.
+        var result = new CreateCustomerCommandValidator().Validate(
+            new CreateCustomerCommand(CustomerType.Individual, "Ana", type, "1010101010"));
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e => e.PropertyName == "IdentificationType");
+    }
+
     [Fact]
     public void CreateCustomer_WhenEmailIsMalformed_ShouldFail()
     {
@@ -117,6 +130,27 @@ public class ValidatorsTests
 
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, e => e.PropertyName == "IdentificationNumber");
+    }
+
+    [Fact]
+    public void AddBeneficiary_WhenDocumentTypeIsNotAllowed_ShouldFail()
+    {
+        var result = new AddBeneficiaryCommandValidator().Validate(
+            new AddBeneficiaryCommand(
+                Guid.NewGuid(), SubjectType.Human, "Laura", new DateOnly(1990, 5, 10),
+                BeneficiaryType.Associated, RelationshipType.Spouse, IdentificationType: "XYZ", IdentificationNumber: "123"));
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e => e.PropertyName == "IdentificationType");
+    }
+
+    [Fact]
+    public void GetByIdentification_WhenTypeIsNotAllowed_ShouldFail()
+    {
+        var result = new GetCustomerByIdentificationQueryValidator().Validate(
+            new GetCustomerByIdentificationQuery("XYZ", "999"));
+
+        Assert.False(result.IsValid);
     }
 
     [Fact]

@@ -72,6 +72,7 @@ public class Beneficiary : AggregateRoot<Guid>
             throw new BusinessRuleException("Un sujeto de tipo Mascota (Pet) debe tener relación 'Pet'.");
 
         var beneficiary = Create(subscriptionId, member.Id, beneficiaryType, relationshipType);
+        beneficiary.Member = member;
 
         beneficiary.AddDomainEvent(new BeneficiaryAddedDomainEvent(
             subscriptionId,
@@ -119,9 +120,30 @@ public class Beneficiary : AggregateRoot<Guid>
         AddDomainEvent(new BeneficiaryUpdatedDomainEvent(SubscriptionId, MemberId, Member.DerivedAge));
     }
 
+    /// <summary>
+    /// Reincorpora a un beneficiario retirado a la misma suscripción.
+    /// El cupo, el estado de la suscripción y el documento repetido los revisa el handler,
+    /// porque dependen de otra raíz (Subscription) y de la base de datos.
+    /// </summary>
     public void Reactivate()
     {
+        if (Status != BeneficiaryStatus.Removed)
+            throw new BusinessRuleException("Solo se puede reincorporar un beneficiario retirado.");
+
+        if (Member is null)
+            throw new InvalidOperationException("Los datos del miembro no fueron cargados.");
+
+        Member.RefreshDerivedAge();
         Status = BeneficiaryStatus.Active;
         RemovedAt = null;
+
+        // Para la auditoría y para Financials, reincorporar equivale a un alta: la cuota vuelve a subir.
+        AddDomainEvent(new BeneficiaryAddedDomainEvent(
+            SubscriptionId,
+            MemberId,
+            Member.SubjectType,
+            Member.DerivedAge,
+            RelationshipType,
+            BeneficiaryType));
     }
 }

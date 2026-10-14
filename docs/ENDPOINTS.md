@@ -3,6 +3,7 @@
 - **URL base (perfil https):** `https://localhost:7035` · **Swagger:** `/swagger` · **Salud:** `GET /health`
 - **Prueba automática de todo:** `.\scripts\smoke-test.ps1`
 - Los enums se envían como texto (`"Individual"`, `"Spouse"`…).
+- `identificationType` solo acepta `CC`, `CE`, `TI`, `RC`, `PA` o `NIT` (sin distinguir mayúsculas); otro valor responde `400`.
 
 ## Códigos de error
 
@@ -10,7 +11,7 @@
 |---|---|
 | `400` | Datos inválidos (validación de FluentValidation) o regla de dominio incumplida |
 | `404` | El recurso no existe |
-| `409` | Conflicto: documento duplicado, cupo lleno, beneficiario ya retirado |
+| `409` | Conflicto: documento duplicado, cupo lleno, beneficiario ya retirado o ya activo, cupo menor a los activos |
 | `422` | La suscripción existe pero no está activa |
 
 Un `400` de validación responde `{ "title": ..., "errors": { "Campo": ["mensaje"] } }`; los demás, `{ "message": "...", "code": "..." }`.
@@ -69,6 +70,7 @@ Reglas: la clave de negocio es **tipo + número** de documento (el mismo número
 | `GET` | `.../beneficiaries?status=Active` | 200 · 404 (`status`: Active \| Removed) |
 | `PUT` | `.../beneficiaries/{memberId}` | 200 · 400 · 404 · 409 |
 | `DELETE` | `.../beneficiaries/{memberId}` | 204 · 404 · 409 |
+| `PATCH` | `.../beneficiaries/{memberId}/reactivate` | 200 · 404 · 409 · 422 (reincorpora a un beneficiario retirado) |
 
 ```jsonc
 // POST

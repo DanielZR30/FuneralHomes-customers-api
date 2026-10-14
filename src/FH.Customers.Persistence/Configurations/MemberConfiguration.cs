@@ -36,7 +36,9 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
         // Documento opcional (null cuando no se informa).
         builder.OwnsOne(m => m.Document, d =>
         {
+            // Enum guardado como texto ("CC", "NIT"...): la columna y sus valores no cambian.
             d.Property(x => x.Type)
+                .HasConversion<string>()
                 .HasColumnName("identification_type")
                 .HasMaxLength(20)
                 .IsRequired();

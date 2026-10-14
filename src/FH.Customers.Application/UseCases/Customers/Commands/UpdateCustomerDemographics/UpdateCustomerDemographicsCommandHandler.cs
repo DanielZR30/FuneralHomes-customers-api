@@ -3,6 +3,7 @@ using FH.Customers.Application.Contracts.Persistence;
 using FH.Customers.Application.Utilities.Results;
 using FH.Customers.Application.UseCases.Customers.Common;
 using FH.Customers.Application.UseCases.Common;
+using FH.Customers.Domain.Exceptions;
 
 namespace FH.Customers.Application.UseCases.Customers.Commands.UpdateCustomerDemographics;
 
@@ -39,7 +40,9 @@ public class UpdateCustomerDemographicsCommandHandler
         {
             customer.UpdateDemographics(request.Name, request.Email, request.Phone, request.Address);
         }
-        catch (ArgumentException ex)
+        // BusinessRuleException: reglas del negocio (nombre obligatorio).
+        // ArgumentException: datos mal formados que rechaza un value object (documento vacío).
+        catch (Exception ex) when (ex is BusinessRuleException or ArgumentException)
         {
             return Result<CustomerResponse>.Failure(ex.Message, "BusinessRule", 400);
         }

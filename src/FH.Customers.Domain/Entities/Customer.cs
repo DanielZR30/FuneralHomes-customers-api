@@ -2,6 +2,7 @@
 using FH.Customers.Domain.Common;
 using FH.Customers.Domain.Common.Enums;
 using FH.Customers.Domain.Common.ValueObjects;
+using FH.Customers.Domain.Exceptions;
 
 namespace FH.Customers.Domain.Entities;
 
@@ -14,7 +15,7 @@ public class Customer : AggregateRoot<Guid>
     public Address? Address { get; private set; }
 
     // Accesos de solo lectura para quien solo necesita el texto (DTOs, consultas simples).
-    public string IdentificationType => Document.Type;
+    public string IdentificationType => Document.Type.ToString();
     public string IdentificationNumber => Document.Number;
     public string? Email => Contact.Email;
     public string? Phone => Contact.Phone;
@@ -35,7 +36,7 @@ public class Customer : AggregateRoot<Guid>
         string? address = null) : base(id)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("El nombre del cliente es obligatorio.", nameof(name));
+            throw new BusinessRuleException("El nombre del cliente es obligatorio.");
 
         CustomerType = customerType;
         Name = name.Trim();
@@ -70,7 +71,7 @@ public class Customer : AggregateRoot<Guid>
     public void UpdateDemographics(string name, string? email, string? phone, string? address)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("El nombre no puede estar vacío.", nameof(name));
+            throw new BusinessRuleException("El nombre no puede estar vacío.");
 
         Name = name.Trim();
         Contact = new ContactInfo(email, phone);

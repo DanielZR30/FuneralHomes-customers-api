@@ -1,5 +1,6 @@
 using CustomerEntity = FH.Customers.Domain.Entities.Customer;
 using FH.Customers.Domain.Common.Enums;
+using FH.Customers.Domain.Exceptions;
 
 namespace FH.Customers.Tests.Domain;
 
@@ -24,10 +25,10 @@ public class CustomerEntityTests
     }
 
     [Fact]
-    public void Create_WithEmptyName_ShouldThrowArgumentException()
+    public void Create_WithEmptyName_ShouldThrowBusinessRuleException()
     {
         // RN-01: el nombre del titular es obligatorio
-        Assert.Throws<ArgumentException>(() =>
+        Assert.Throws<BusinessRuleException>(() =>
             CustomerEntity.Create(CustomerType.Individual, "   ", "CC", "1010101010"));
     }
 
@@ -70,12 +71,12 @@ public class CustomerEntityTests
     }
 
     [Fact]
-    public void UpdateDemographics_WithBlankName_ShouldThrowArgumentException()
+    public void UpdateDemographics_WithBlankName_ShouldThrowBusinessRuleException()
     {
         var customer = CustomerEntity.Create(CustomerType.Individual, "Ana", "CC", "1010101010");
 
         // RN-04: el nombre no puede quedar vacío
-        Assert.Throws<ArgumentException>(() =>
+        Assert.Throws<BusinessRuleException>(() =>
             customer.UpdateDemographics("   ", "nuevo@correo.com", null, null));
     }
 

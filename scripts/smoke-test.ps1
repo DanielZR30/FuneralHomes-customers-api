@@ -45,6 +45,7 @@ Call "Salud" GET "/health" $null 200 | Out-Null
 $cust = Call "Crear cliente" POST "/api/v1/customers" @{ customerType = "Individual"; name = "Cliente Prueba $run"; identificationType = "CC"; identificationNumber = $doc; email = "prueba$run@example.com"; phone = "+573001112233"; address = "Calle 1" } 201
 Call "Crear cliente duplicado (409)" POST "/api/v1/customers" @{ customerType = "Individual"; name = "Otro"; identificationType = "CC"; identificationNumber = $doc } 409 | Out-Null
 Call "Crear cliente con correo inválido (400, FluentValidation)" POST "/api/v1/customers" @{ customerType = "Individual"; name = "Ana"; identificationType = "CC"; identificationNumber = "E$run"; email = "no-es-correo" } 400 | Out-Null
+Call "Crear cliente con tipo de documento no permitido (400)" POST "/api/v1/customers" @{ customerType = "Individual"; name = "Ana"; identificationType = "CEDULA"; identificationNumber = "T$run" } 400 | Out-Null
 Call "Crear cliente sin nombre (400)" POST "/api/v1/customers" @{ customerType = "Individual"; name = ""; identificationType = "CC"; identificationNumber = "X$run" } 400 | Out-Null
 if (-not $cust) { Write-Host "No se pudo crear el cliente: se detiene la prueba." -ForegroundColor Red; $script:results | Format-Table -AutoSize; exit 1 }
 $cid = $cust.id
@@ -81,10 +82,12 @@ if ($ben) {
     Call "Auditoría del miembro" GET "/api/v1/members/$mid/audit-log" $null 200 | Out-Null
     Call "Retirar beneficiario" DELETE "/api/v1/subscriptions/$sid/beneficiaries/$mid" $null 204 | Out-Null
     Call "Retirar de nuevo el mismo beneficiario (409)" DELETE "/api/v1/subscriptions/$sid/beneficiaries/$mid" $null 409 | Out-Null
+    Call "Reincorporar beneficiario retirado (200)" PATCH "/api/v1/subscriptions/$sid/beneficiaries/$mid/reactivate" $null 200 | Out-Null
+    Call "Reincorporar un beneficiario activo (409)" PATCH "/api/v1/subscriptions/$sid/beneficiaries/$mid/reactivate" $null 409 | Out-Null
 }
 Call "Mascota con relación distinta a Pet (400)" POST "/api/v1/subscriptions/$sid/beneficiaries" @{ subjectType = "Pet"; firstName = "Firulais"; birthDate = "2020-01-01"; beneficiaryType = "Associated"; relationshipType = "Spouse" } 400 | Out-Null
 Call "Agregar mascota (201)" POST "/api/v1/subscriptions/$sid/beneficiaries" @{ subjectType = "Pet"; firstName = "Firulais"; birthDate = "2020-01-01"; beneficiaryType = "Associated"; relationshipType = "Pet" } 201 | Out-Null
-# RN-05: el cupo no puede quedar por debajo de los beneficiarios activos (ahora hay 2: la mascota y Mateo)
+# RN-05: el cupo no puede quedar por debajo de los beneficiarios activos (ahora hay 3: Laura reincorporada, la mascota y Mateo)
 Call "Agregar segundo beneficiario activo (201)" POST "/api/v1/subscriptions/$sid/beneficiaries" @{ subjectType = "Human"; firstName = "Mateo"; birthDate = "2015-03-20"; beneficiaryType = "Associated"; relationshipType = "Child"; identificationType = "TI"; identificationNumber = "C$run" } 201 | Out-Null
 Call "Bajar cupo por debajo de los activos (409, RN-05)" PATCH "/api/v1/subscriptions/$sid/max-beneficiaries" @{ maxBeneficiaries = 1 } 409 | Out-Null
 Call "Suscripción inexistente en beneficiarios (404)" GET "/api/v1/subscriptions/11111111-2222-3333-4444-555555555555/beneficiaries" $null 404 | Out-Null

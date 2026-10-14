@@ -1,4 +1,5 @@
 using FluentValidation;
+using FH.Customers.Domain.Common.ValueObjects;
 
 namespace FH.Customers.Application.UseCases.Customers.Commands.CreateCustomer;
 
@@ -13,8 +14,13 @@ public class CreateCustomerCommandValidator : AbstractValidator<CreateCustomerCo
             .MaximumLength(255).WithMessage("El nombre no puede superar 255 caracteres.");
 
         RuleFor(x => x.IdentificationType)
-            .NotEmpty().WithMessage("El tipo de identificación es obligatorio.")
-            .MaximumLength(20).WithMessage("El tipo de identificación no puede superar 20 caracteres.");
+            .NotEmpty().WithMessage("El tipo de identificación es obligatorio.");
+
+        // Regla aparte: el .When de abajo no debe apagar el NotEmpty de arriba.
+        RuleFor(x => x.IdentificationType)
+            .Must(DocumentId.IsValidType)
+            .WithMessage($"El tipo de identificación no es válido. Valores permitidos: {DocumentId.AllowedTypes}.")
+            .When(x => !string.IsNullOrWhiteSpace(x.IdentificationType));
 
         RuleFor(x => x.IdentificationNumber)
             .NotEmpty().WithMessage("El número de identificación es obligatorio.")

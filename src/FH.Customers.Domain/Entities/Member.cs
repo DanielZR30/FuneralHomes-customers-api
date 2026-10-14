@@ -18,7 +18,7 @@ public class Member : BaseEntity<Guid>
     public ContactInfo Contact { get; private set; } = new(null, null);
 
     // Accesos de solo lectura para quien solo necesita el texto.
-    public string? IdentificationType => Document?.Type;
+    public string? IdentificationType => Document?.Type.ToString();
     public string? IdentificationNumber => Document?.Number;
     public string? Email => Contact.Email;
     public string? Phone => Contact.Phone;

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using FH.Customers.Application.Utilities.Mediator;
 using FH.Customers.Application.UseCases.Beneficiaries.Commands.AddBeneficiary;
+using FH.Customers.Application.UseCases.Beneficiaries.Commands.ReactivateBeneficiary;
 using FH.Customers.Application.UseCases.Beneficiaries.Commands.RemoveBeneficiary;
 using FH.Customers.Application.UseCases.Beneficiaries.Commands.UpdateBeneficiary;
 using FH.Customers.Application.UseCases.Beneficiaries.Queries.GetBeneficiariesBySubscription;
@@ -82,6 +83,24 @@ public class BeneficiariesController(IMediator mediator) : ApiControllerBase(med
             cancellationToken);
 
         return result.IsFailure ? ToError(result) : NoContent();
+    }
+
+    /// <summary>Reincorporar a un beneficiario retirado a la misma suscripción (revisa estado, cupo y documento)</summary>
+    [HttpPatch("{memberId:guid}/reactivate")]
+    [ProducesResponseType(typeof(BeneficiaryResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> Reactivate(
+        Guid subscriptionId,
+        Guid memberId,
+        CancellationToken cancellationToken)
+    {
+        var result = await Mediator.Send(
+            new ReactivateBeneficiaryCommand(subscriptionId, memberId),
+            cancellationToken);
+
+        return result.IsFailure ? ToError(result) : Ok(result.Value);
     }
 
     /// <summary>Actualizar los datos de un beneficiario activo (el tipo de sujeto y el parentesco no cambian)</summary>

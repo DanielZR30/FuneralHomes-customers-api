@@ -6,6 +6,7 @@ using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Domain.Common.Enums;
 using FH.Customers.Application.Contracts.Persistence;
 using FH.Customers.Application.UseCases.Beneficiaries.Commands.AddBeneficiary;
+using FH.Customers.Application.UseCases.Beneficiaries.Commands.ReactivateBeneficiary;
 
 namespace FH.Customers.Tests.Application;
 
@@ -170,6 +171,122 @@ public class BeneficiaryHandlerTests
 
         var result = await handler.Handle(
             new RemoveBeneficiaryCommand(subscriptionId, member.Id), CancellationToken.None);
+
+        Assert.Equal(409, result.StatusCode);
+        _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    // ---------- ReactivateBeneficiary ----------
+
+    private ReactivateBeneficiaryCommandHandler ReactivateHandler() =>
+        new(_subscriptions.Object, _beneficiaries.Object, _unitOfWork.Object);
+
+    private Beneficiary GivenRemovedBeneficiary(Subscription subscription, string? docType = "CC", string? docNumber = "123")
+    {
+        var member = Member.Create(SubjectType.Human, "Luis", new DateOnly(1990, 1, 1), "Pérez", docType, docNumber);
+        var beneficiary = Beneficiary.Enroll(subscription.Id, member, BeneficiaryType.Associated, RelationshipType.Child);
+        beneficiary.Remove();
+        _beneficiaries
+            .Setup(r => r.GetAsync(subscription.Id, member.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(beneficiary);
+        return beneficiary;
+    }
+
+    [Fact]
+    public async Task Reactivate_WhenRemovedAndThereIsRoom_ShouldCommitAndReturn200()
+    {
+        var subscription = NewSubscription(max: 2);
+        GivenSubscription(subscription);
+        var beneficiary = GivenRemovedBeneficiary(subscription);
+        _beneficiaries
+            .Setup(r => r.CountActiveAsync(subscription.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
+
+        var result = await ReactivateHandler().Handle(
+            new ReactivateBeneficiaryCommand(subscription.Id, beneficiary.MemberId), CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(200, result.StatusCode);
+        Assert.Equal(BeneficiaryStatus.Active, beneficiary.Status);
+        _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Reactivate_WhenBeneficiaryDoesNotExist_ShouldReturnNotFound()
+    {
+        var result = await ReactivateHandler().Handle(
+            new ReactivateBeneficiaryCommand(Guid.NewGuid(), Guid.NewGuid()), CancellationToken.None);
+
+        Assert.Equal(404, result.StatusCode);
+        _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Reactivate_WhenAlreadyActive_ShouldReturnConflict()
+    {
+        var subscription = NewSubscription();
+        GivenSubscription(subscription);
+        var member = Member.Create(SubjectType.Human, "Luis", new DateOnly(1990, 1, 1));
+        var beneficiary = Beneficiary.Enroll(subscription.Id, member, BeneficiaryType.Associated, RelationshipType.Child);
+        _beneficiaries
+            .Setup(r => r.GetAsync(subscription.Id, member.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(beneficiary);
+
+        var result = await ReactivateHandler().Handle(
+            new ReactivateBeneficiaryCommand(subscription.Id, member.Id), CancellationToken.None);
+
+        Assert.Equal(409, result.StatusCode);
+        _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Reactivate_WhenQuotaIsFull_ShouldReturnConflict()
+    {
+        var subscription = NewSubscription(max: 2);
+        GivenSubscription(subscription);
+        var beneficiary = GivenRemovedBeneficiary(subscription);
+        _beneficiaries
+            .Setup(r => r.CountActiveAsync(subscription.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(2);
+
+        var result = await ReactivateHandler().Handle(
+            new ReactivateBeneficiaryCommand(subscription.Id, beneficiary.MemberId), CancellationToken.None);
+
+        Assert.Equal(409, result.StatusCode);
+        _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Reactivate_WhenSubscriptionIsNotActive_ShouldReturn422()
+    {
+        var subscription = NewSubscription();
+        var beneficiary = GivenRemovedBeneficiary(subscription);
+        subscription.Suspend();
+        GivenSubscription(subscription);
+
+        var result = await ReactivateHandler().Handle(
+            new ReactivateBeneficiaryCommand(subscription.Id, beneficiary.MemberId), CancellationToken.None);
+
+        Assert.Equal(422, result.StatusCode);
+        _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Reactivate_WhenAnotherActiveBeneficiaryHasSameDocument_ShouldReturnConflict()
+    {
+        var subscription = NewSubscription(max: 3);
+        GivenSubscription(subscription);
+        var beneficiary = GivenRemovedBeneficiary(subscription);
+        _beneficiaries
+            .Setup(r => r.CountActiveAsync(subscription.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
+        _beneficiaries
+            .Setup(r => r.ExistsActiveByIdentificationAsync(
+                subscription.Id, "CC", "123", It.IsAny<CancellationToken>(), beneficiary.MemberId))
+            .ReturnsAsync(true);
+
+        var result = await ReactivateHandler().Handle(
+            new ReactivateBeneficiaryCommand(subscription.Id, beneficiary.MemberId), CancellationToken.None);
 
         Assert.Equal(409, result.StatusCode);
         _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
