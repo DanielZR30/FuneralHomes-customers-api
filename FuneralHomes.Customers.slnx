@@ -1,13 +1,21 @@
 <Solution>
-  <Folder Name="/src/">
-    <Project Path="src/FH.Customers.Domain/FH.Customers.Domain.csproj" />
+  <Folder Name="/Core/">
     <Project Path="src/FH.Customers.Application/FH.Customers.Application.csproj" />
-    <Project Path="src/FH.Customers.Persistence/FH.Customers.Persistence.csproj" />
+    <Project Path="src/FH.Customers.Domain/FH.Customers.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Infrastructure/">
     <Project Path="src/FH.Customers.Infrastructure/FH.Customers.Infrastructure.csproj" />
+    <Project Path="src/FH.Customers.Persistence/FH.Customers.Persistence.csproj" />
+  </Folder>
+  <Folder Name="/Presenters/">
     <Project Path="src/FH.Customers.Api/FH.Customers.Api.csproj" />
   </Folder>
-  <Folder Name="/tests/">
-    <Project Path="tests/FH.Customers.Tests/FH.Customers.Tests.csproj" />
+  <Folder Name="/scripts/">
+    <File Path="scripts/reset-db.ps1" />
+    <File Path="scripts/smoke-test.ps1" />
+  </Folder>
+  <Folder Name="/Tests/">
     <Project Path="tests/FH.CustomerPlans.Tests/FH.CustomerPlans.Tests.csproj" />
+    <Project Path="tests/FH.Customers.Tests/FH.Customers.Tests.csproj" />
   </Folder>
 </Solution>
