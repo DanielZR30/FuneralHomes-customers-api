@@ -54,7 +54,7 @@ public sealed class Subscription : AggregateRoot<Guid>
         var period = new SubscriptionPeriod(startDate, endDate);
         var subscription = new Subscription(id, customerId, externalPlanId, maxBeneficiaries, period);
 
-        subscription.AddDomainEvent(new SubscriptionCreated(
+        subscription.AddDomainEvent(new SubscriptionCreatedDomainEvent(
             id,
             customerId,
             externalPlanId,
@@ -79,7 +79,7 @@ public sealed class Subscription : AggregateRoot<Guid>
         Period = new SubscriptionPeriod(Period.StartDate, effectiveEndDate);
         Status = SubscriptionStatus.Cancelled;
 
-        AddDomainEvent(new SubscriptionCancelled(Id, CustomerId, effectiveEndDate));
+        AddDomainEvent(new SubscriptionCancelledDomainEvent(Id, CustomerId, effectiveEndDate));
     }
 
     public void UpdateMaxBeneficiaries(MaxBeneficiaries newMax)
@@ -97,7 +97,7 @@ public sealed class Subscription : AggregateRoot<Guid>
         var previousMax = MaxBeneficiaries.Value;
         MaxBeneficiaries = newMax;
 
-        AddDomainEvent(new MaxBeneficiariesUpdated(Id, previousMax, newMax.Value));
+        AddDomainEvent(new MaxBeneficiariesUpdatedDomainEvent(Id, previousMax, newMax.Value));
     }
 
     public void Suspend()

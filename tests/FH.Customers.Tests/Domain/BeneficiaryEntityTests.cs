@@ -117,4 +117,16 @@ public class BeneficiaryEntityTests
         Assert.Throws<BusinessRuleException>(() => beneficiary.UpdateMemberDetails(
             "Nuevo", new DateOnly(1991, 1, 1), null, null, null, null, null));
     }
+
+    [Fact]
+    public void RefreshDerivedAge_ShouldRecalculateAgeFromBirthDate()
+    {
+        var member = Member.Create(SubjectType.Human, "Luis", new DateOnly(1990, 6, 15));
+
+        member.RefreshDerivedAge(new DateOnly(2030, 6, 14));
+        Assert.Equal(39, member.DerivedAge);
+
+        member.RefreshDerivedAge(new DateOnly(2030, 6, 15));
+        Assert.Equal(40, member.DerivedAge);
+    }
 }

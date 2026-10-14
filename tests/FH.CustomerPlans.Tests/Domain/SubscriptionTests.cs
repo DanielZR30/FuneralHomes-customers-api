@@ -29,7 +29,7 @@ public class SubscriptionTests
         Assert.Equal(SubscriptionStatus.Active, sub.Status); // RN-03
 
         var createdEvent = Assert.Single(sub.DomainEvents);
-        var subCreated = Assert.IsType<SubscriptionCreated>(createdEvent);
+        var subCreated = Assert.IsType<SubscriptionCreatedDomainEvent>(createdEvent);
         Assert.Equal(sub.Id, subCreated.SubscriptionId);
         Assert.Equal(_customerId, subCreated.CustomerId);
         Assert.Equal(3, subCreated.MaxBeneficiaries);
@@ -69,7 +69,7 @@ public class SubscriptionTests
         Assert.Equal(SubscriptionStatus.Cancelled, sub.Status);
         Assert.Equal(today, sub.Period.EndDate);
 
-        var cancelEvent = sub.DomainEvents.OfType<SubscriptionCancelled>().Single();
+        var cancelEvent = sub.DomainEvents.OfType<SubscriptionCancelledDomainEvent>().Single();
         Assert.Equal(sub.Id, cancelEvent.SubscriptionId);
         Assert.Equal(today, cancelEvent.CancelledDate);
     }
@@ -134,7 +134,7 @@ public class SubscriptionTests
         sub.UpdateMaxBeneficiaries(new MaxBeneficiaries(5));
 
         Assert.Equal(5, sub.MaxBeneficiaries.Value);
-        var updatedEvent = sub.DomainEvents.OfType<MaxBeneficiariesUpdated>().Single();
+        var updatedEvent = sub.DomainEvents.OfType<MaxBeneficiariesUpdatedDomainEvent>().Single();
         Assert.Equal(2, updatedEvent.PreviousMax);
         Assert.Equal(5, updatedEvent.NewMax);
     }

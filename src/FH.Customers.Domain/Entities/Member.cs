@@ -77,7 +77,8 @@ public class Member : BaseEntity<Guid>
         DerivedAge = CalculateAge(BirthDate, asOfDate);
     }
 
-    public void UpdateDetails(
+    // Solo se modifica a través de su raíz: Beneficiary.UpdateMemberDetails.
+    internal void UpdateDetails(
     string firstName,
     DateOnly birthDate,
     string? lastName = null,

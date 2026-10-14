@@ -22,7 +22,7 @@ public static class DependencyInjection
         // Gateways y adaptadores de puertos
         services.AddScoped<ICustomerExistenceChecker, CustomerExistenceChecker>();
         services.AddScoped<IFinancialsPlanGateway, FinancialsPlanGatewayStub>();
-        services.AddScoped<IAssignedBeneficiariesCounter, AssignedBeneficiariesCounterStub>();
+        services.AddScoped<IAssignedBeneficiariesCounter, AssignedBeneficiariesCounter>();
 
         // Mensajería: publicador en memoria (registra en el log). Kafka se conecta cambiando esta línea.
         services.AddScoped<IEventPublisher, InMemoryEventPublisher>();

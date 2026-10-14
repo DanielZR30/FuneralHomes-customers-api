@@ -2,12 +2,15 @@ using FH.Customers.Domain.Common;
 
 namespace FH.Customers.Domain.Common.Events;
 
-public sealed record SubscriptionCancelled(
+public sealed record SubscriptionCreatedDomainEvent(
     Guid SubscriptionId,
     Guid CustomerId,
-    DateOnly CancelledDate) : IDomainEvent
+    Guid ExternalPlanId,
+    int MaxBeneficiaries,
+    DateOnly StartDate,
+    DateOnly? EndDate) : IDomainEvent
 {
     public Guid EventId { get; } = Guid.NewGuid();
     public DateTime OccurredOn { get; } = DateTime.UtcNow;
-    public string EventType => nameof(SubscriptionCancelled);
+    public string EventType => "SUBSCRIPTION_CREATED";
 }

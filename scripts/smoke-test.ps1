@@ -84,6 +84,9 @@ if ($ben) {
 }
 Call "Mascota con relación distinta a Pet (400)" POST "/api/v1/subscriptions/$sid/beneficiaries" @{ subjectType = "Pet"; firstName = "Firulais"; birthDate = "2020-01-01"; beneficiaryType = "Associated"; relationshipType = "Spouse" } 400 | Out-Null
 Call "Agregar mascota (201)" POST "/api/v1/subscriptions/$sid/beneficiaries" @{ subjectType = "Pet"; firstName = "Firulais"; birthDate = "2020-01-01"; beneficiaryType = "Associated"; relationshipType = "Pet" } 201 | Out-Null
+# RN-05: el cupo no puede quedar por debajo de los beneficiarios activos (ahora hay 2: la mascota y Mateo)
+Call "Agregar segundo beneficiario activo (201)" POST "/api/v1/subscriptions/$sid/beneficiaries" @{ subjectType = "Human"; firstName = "Mateo"; birthDate = "2015-03-20"; beneficiaryType = "Associated"; relationshipType = "Child"; identificationType = "TI"; identificationNumber = "C$run" } 201 | Out-Null
+Call "Bajar cupo por debajo de los activos (409, RN-05)" PATCH "/api/v1/subscriptions/$sid/max-beneficiaries" @{ maxBeneficiaries = 1 } 409 | Out-Null
 Call "Suscripción inexistente en beneficiarios (404)" GET "/api/v1/subscriptions/11111111-2222-3333-4444-555555555555/beneficiaries" $null 404 | Out-Null
 
 # ---------- Validaciones (FluentValidation) ----------

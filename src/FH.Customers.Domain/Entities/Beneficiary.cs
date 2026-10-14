@@ -44,18 +44,9 @@ public class Beneficiary : AggregateRoot<Guid>
         JoinedAt = DateTime.UtcNow;
     }
 
-    /// <summary>Crea un beneficiario con un id conocido (datos de ejemplo, pruebas).</summary>
-    public static Beneficiary Create(
-        Guid id,
-        Guid subscriptionId,
-        Guid memberId,
-        BeneficiaryType beneficiaryType,
-        RelationshipType relationshipType)
-    {
-        return new Beneficiary(id, subscriptionId, memberId, beneficiaryType, relationshipType);
-    }
-
-    public static Beneficiary Create(
+    // La puerta de negocio es Enroll (aplica las reglas y anota el evento).
+    // Create queda interno: solo lo usa Enroll y las pruebas del dominio.
+    internal static Beneficiary Create(
         Guid subscriptionId,
         Guid memberId,
         BeneficiaryType beneficiaryType,

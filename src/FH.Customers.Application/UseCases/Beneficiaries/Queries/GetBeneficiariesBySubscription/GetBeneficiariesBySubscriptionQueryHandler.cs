@@ -37,6 +37,13 @@ public class GetBeneficiariesBySubscriptionQueryHandler
             request.Status,
             cancellationToken);
 
+        // La edad derivada se guarda al crear o actualizar el miembro; se recalcula al consultar
+        // para que no quede desactualizada (no se guarda: esta consulta no hace commit).
+        foreach (var beneficiary in beneficiaries)
+        {
+            beneficiary.Member!.RefreshDerivedAge();
+        }
+
         IReadOnlyList<BeneficiaryResponse> response = beneficiaries
             .Select(b => BeneficiaryResponse.FromEntity(b, b.Member!))
             .ToList();

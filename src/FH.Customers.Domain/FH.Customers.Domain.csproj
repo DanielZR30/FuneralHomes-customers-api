@@ -7,4 +7,9 @@
     <RootNamespace>FH.Customers.Domain</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Las pruebas del dominio pueden usar los métodos internal (p. ej. Beneficiary.Create). -->
+    <InternalsVisibleTo Include="FH.Customers.Tests" />
+  </ItemGroup>
+
 </Project>

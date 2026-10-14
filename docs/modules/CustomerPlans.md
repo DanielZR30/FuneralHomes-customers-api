@@ -126,7 +126,7 @@ Domain/
 ├── Entities/                    # Subscription (AggregateRoot<Guid>)
 ├── Common/
 │   ├── Enums/                   # SubscriptionStatus
-│   ├── Events/                  # SubscriptionCreated, SubscriptionCancelled, MaxBeneficiariesUpdated
+│   ├── Events/                  # SubscriptionCreatedDomainEvent, SubscriptionCancelledDomainEvent, MaxBeneficiariesUpdatedDomainEvent
 │   └── ValueObjects/            # MaxBeneficiaries, SubscriptionPeriod
 └── Exceptions/                  # BusinessRuleException
 
@@ -149,7 +149,7 @@ Persistence/
 ├── Configurations/              # SubscriptionConfiguration
 └── Repositories/                # SubscriptionRepository
 
-Infrastructure/CustomerPlans/Gateways/   # Adaptadores: CustomerExistenceChecker, FinancialsPlanGatewayStub, AssignedBeneficiariesCounterStub
+Infrastructure/CustomerPlans/Gateways/   # Adaptadores: CustomerExistenceChecker, FinancialsPlanGatewayStub, AssignedBeneficiariesCounter
 
 Api/
 ├── Controllers/                 # SubscriptionsController
