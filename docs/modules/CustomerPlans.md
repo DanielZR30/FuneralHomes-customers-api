@@ -133,7 +133,7 @@ Domain/
 Application/
 ├── Contracts/
 │   ├── Repositories/            # ISubscriptionRepository
-│   └── Gateways/                # IFinancialsPlanGateway, ICustomerExistenceChecker, IAssignedBeneficiariesCounter
+│   └── Gateways/                # IFinancialsPlanGateway (el cliente y el conteo de beneficiarios se consultan con ICustomerRepository e IBeneficiaryRepository)
 └── UseCases/CustomerPlans/
     ├── Commands/
     │   ├── SubscribeCustomer/        # Command, Handler, Validator
@@ -149,7 +149,7 @@ Persistence/
 ├── Configurations/              # SubscriptionConfiguration
 └── Repositories/                # SubscriptionRepository
 
-Infrastructure/CustomerPlans/Gateways/   # Adaptadores: CustomerExistenceChecker, FinancialsPlanGatewayStub, AssignedBeneficiariesCounter
+Infrastructure/CustomerPlans/Gateways/   # Adaptador: FinancialsPlanGatewayStub (hacia Financials)
 
 Api/
 ├── Controllers/                 # SubscriptionsController

@@ -4,9 +4,7 @@ using FH.Customers.Application.UseCases.CustomerPlans;
 using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Domain.Common.ValueObjects;
 using FH.Customers.Domain.Entities;
-using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Application.Contracts.Persistence;
-using FH.Customers.Application.Contracts.Gateways;
 using FH.Customers.Application.UseCases.CustomerPlans.Commands.UpdateMaxBeneficiaries;
 
 namespace FH.CustomerPlans.Tests.Application;
@@ -14,7 +12,7 @@ namespace FH.CustomerPlans.Tests.Application;
 public class UpdateMaxBeneficiariesCommandHandlerTests
 {
     private readonly Mock<ISubscriptionRepository> _repositoryMock = new();
-    private readonly Mock<IAssignedBeneficiariesCounter> _counterMock = new();
+    private readonly Mock<IBeneficiaryRepository> _beneficiariesMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
     private readonly UpdateMaxBeneficiariesCommandHandler _handler;
 
@@ -22,7 +20,7 @@ public class UpdateMaxBeneficiariesCommandHandlerTests
     {
         _handler = new UpdateMaxBeneficiariesCommandHandler(
             _repositoryMock.Object,
-            _counterMock.Object,
+            _beneficiariesMock.Object,
             _unitOfWorkMock.Object);
     }
 
@@ -40,7 +38,7 @@ public class UpdateMaxBeneficiariesCommandHandlerTests
         _repositoryMock.Setup(r => r.GetByIdAsync(subId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(sub);
 
-        _counterMock.Setup(c => c.CountActiveBeneficiariesAsync(subId, It.IsAny<CancellationToken>()))
+        _beneficiariesMock.Setup(c => c.CountActiveAsync(subId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(2); // RN-05: 2 beneficiarios asignados
 
         // Act: Ampliar a 5 cupos
@@ -67,7 +65,7 @@ public class UpdateMaxBeneficiariesCommandHandlerTests
         _repositoryMock.Setup(r => r.GetByIdAsync(subId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(sub);
 
-        _counterMock.Setup(c => c.CountActiveBeneficiariesAsync(subId, It.IsAny<CancellationToken>()))
+        _beneficiariesMock.Setup(c => c.CountActiveAsync(subId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(3); // 3 beneficiarios asignados
 
         // Act: Intentar reducir a 2
@@ -110,7 +108,7 @@ public class UpdateMaxBeneficiariesCommandHandlerTests
         _repositoryMock.Setup(r => r.GetByIdAsync(subId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(sub);
 
-        _counterMock.Setup(c => c.CountActiveBeneficiariesAsync(subId, It.IsAny<CancellationToken>()))
+        _beneficiariesMock.Setup(c => c.CountActiveAsync(subId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(0);
 
         var result = await _handler.Handle(new UpdateMaxBeneficiariesCommand(subId, 6), CancellationToken.None);

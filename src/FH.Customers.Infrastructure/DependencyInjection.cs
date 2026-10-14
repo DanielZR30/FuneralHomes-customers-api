@@ -19,10 +19,9 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration? configuration = null)
     {
-        // Gateways y adaptadores de puertos
-        services.AddScoped<ICustomerExistenceChecker, CustomerExistenceChecker>();
+        // Gateways: puertos hacia otros microservicios (Financials). Lo que vive en nuestra
+        // propia base de datos se consulta con repositorios, no con gateways.
         services.AddScoped<IFinancialsPlanGateway, FinancialsPlanGatewayStub>();
-        services.AddScoped<IAssignedBeneficiariesCounter, AssignedBeneficiariesCounter>();
 
         // Mensajería: publicador en memoria (registra en el log). Kafka se conecta cambiando esta línea.
         services.AddScoped<IEventPublisher, InMemoryEventPublisher>();

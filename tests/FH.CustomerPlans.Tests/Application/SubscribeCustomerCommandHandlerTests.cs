@@ -2,9 +2,9 @@ using Moq;
 using Xunit;
 using FH.Customers.Application.UseCases.CustomerPlans;
 using FH.Customers.Application.Contracts.Repositories;
+using FH.Customers.Domain.Common.Enums;
 using FH.Customers.Domain.Common.ValueObjects;
 using FH.Customers.Domain.Entities;
-using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Application.Contracts.Persistence;
 using FH.Customers.Application.Contracts.Gateways;
 using FH.Customers.Application.UseCases.CustomerPlans.Commands.SubscribeCustomer;
@@ -14,7 +14,7 @@ namespace FH.CustomerPlans.Tests.Application;
 public class SubscribeCustomerCommandHandlerTests
 {
     private readonly Mock<ISubscriptionRepository> _repositoryMock = new();
-    private readonly Mock<ICustomerExistenceChecker> _customerCheckerMock = new();
+    private readonly Mock<ICustomerRepository> _customersMock = new();
     private readonly Mock<IFinancialsPlanGateway> _planGatewayMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
@@ -24,9 +24,38 @@ public class SubscribeCustomerCommandHandlerTests
     {
         _handler = new SubscribeCustomerCommandHandler(
             _repositoryMock.Object,
-            _customerCheckerMock.Object,
+            _customersMock.Object,
             _planGatewayMock.Object,
             _unitOfWorkMock.Object);
+    }
+
+    private void GivenCustomer(Guid customerId, bool exists, bool active = true)
+    {
+        Customer? customer = null;
+        if (exists)
+        {
+            customer = new Customer(customerId, CustomerType.Individual, "Ana", "CC", "1010101010");
+            if (!active)
+                customer.Deactivate();
+        }
+
+        _customersMock
+            .Setup(r => r.GetByIdAsync(customerId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(customer);
+    }
+
+    [Fact]
+    public async Task Handle_WhenCustomerExistsButIsInactive_ShouldReturnNotFound()
+    {
+        // RN-06: el cliente debe existir y estar activo
+        var customerId = Guid.NewGuid();
+        GivenCustomer(customerId, exists: true, active: false);
+
+        var result = await _handler.Handle(
+            new SubscribeCustomerCommand(customerId, Guid.NewGuid(), 2, new DateOnly(2026, 10, 1)),
+            CancellationToken.None);
+
+        Assert.Equal(404, result.StatusCode);
     }
 
     [Fact]
@@ -37,8 +66,7 @@ public class SubscribeCustomerCommandHandlerTests
         var planId = Guid.NewGuid();
         var command = new SubscribeCustomerCommand(customerId, planId, 4, new DateOnly(2026, 10, 1));
 
-        _customerCheckerMock.Setup(c => c.ExistsActiveAsync(customerId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true); // RN-06
+        GivenCustomer(customerId, exists: true); // RN-06
 
         _planGatewayMock.Setup(p => p.PlanExistsAsync(planId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true); // RN-08
@@ -69,8 +97,7 @@ public class SubscribeCustomerCommandHandlerTests
         var customerId = Guid.NewGuid();
         var command = new SubscribeCustomerCommand(customerId, Guid.NewGuid(), 2, new DateOnly(2026, 10, 1));
 
-        _customerCheckerMock.Setup(c => c.ExistsActiveAsync(customerId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(false);
+        GivenCustomer(customerId, exists: false);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -92,8 +119,7 @@ public class SubscribeCustomerCommandHandlerTests
         var planId = Guid.NewGuid();
         var command = new SubscribeCustomerCommand(customerId, planId, 2, new DateOnly(2026, 10, 1));
 
-        _customerCheckerMock.Setup(c => c.ExistsActiveAsync(customerId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true);
+        GivenCustomer(customerId, exists: true);
 
         _planGatewayMock.Setup(p => p.PlanExistsAsync(planId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
@@ -122,8 +148,7 @@ public class SubscribeCustomerCommandHandlerTests
             new DateOnly(2026, 10, 1),
             new DateOnly(2026, 12, 31));
 
-        _customerCheckerMock.Setup(c => c.ExistsActiveAsync(customerId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true);
+        GivenCustomer(customerId, exists: true);
 
         _planGatewayMock.Setup(p => p.PlanExistsAsync(planId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
@@ -162,8 +187,7 @@ public class SubscribeCustomerCommandHandlerTests
             new DateOnly(2026, 11, 1),
             new DateOnly(2026, 12, 31));
 
-        _customerCheckerMock.Setup(c => c.ExistsActiveAsync(customerId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true);
+        GivenCustomer(customerId, exists: true);
 
         _planGatewayMock.Setup(p => p.PlanExistsAsync(planId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
