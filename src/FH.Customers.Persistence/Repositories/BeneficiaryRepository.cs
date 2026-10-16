@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using FH.Customers.Domain.Entities;
 using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Domain.Common.Enums;
+using FH.Customers.Domain.Common.ValueObjects;
 
 namespace FH.Customers.Persistence.Repositories;
 
@@ -40,13 +41,18 @@ public class BeneficiaryRepository : IBeneficiaryRepository
         CancellationToken cancellationToken = default,
         Guid? excludeMemberId = null)
     {
+        if (!DocumentId.TryParseType(identificationType, out var type))
+            return false;
+
+        var number = identificationNumber.Trim().ToUpperInvariant();
+
         return await _context.Beneficiaries
             .AnyAsync(
                 b => b.SubscriptionId == subscriptionId
                      && b.Status == BeneficiaryStatus.Active
                      && (excludeMemberId == null || b.MemberId != excludeMemberId)
-                     && b.Member!.Document!.Type == identificationType
-                     && b.Member.Document!.Number == identificationNumber,
+                     && b.Member!.Document!.Type == type
+                     && b.Member.Document!.Number == number,
                 cancellationToken);
     }
 

@@ -1,10 +1,8 @@
-using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Domain.Entities;
 using FH.Customers.Domain.Common.ValueObjects;
 using FH.Customers.Domain.Exceptions;
 using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Application.Contracts.Persistence;
-using FH.Customers.Application.Contracts.Gateways;
 using FH.Customers.Application.Utilities.Results;
 using FH.Customers.Application.UseCases.CustomerPlans.Common;
 using FH.Customers.Application.UseCases.Common;
@@ -14,16 +12,16 @@ namespace FH.Customers.Application.UseCases.CustomerPlans.Commands.UpdateMaxBene
 public class UpdateMaxBeneficiariesCommandHandler : ICommandHandler<UpdateMaxBeneficiariesCommand, SubscriptionDto>
 {
     private readonly ISubscriptionRepository _subscriptionRepository;
-    private readonly IAssignedBeneficiariesCounter _beneficiariesCounter;
+    private readonly IBeneficiaryRepository _beneficiaries;
     private readonly IUnitOfWork _unitOfWork;
 
     public UpdateMaxBeneficiariesCommandHandler(
         ISubscriptionRepository subscriptionRepository,
-        IAssignedBeneficiariesCounter beneficiariesCounter,
+        IBeneficiaryRepository beneficiaries,
         IUnitOfWork unitOfWork)
     {
         _subscriptionRepository = subscriptionRepository;
-        _beneficiariesCounter = beneficiariesCounter;
+        _beneficiaries = beneficiaries;
         _unitOfWork = unitOfWork;
     }
 
@@ -38,7 +36,7 @@ public class UpdateMaxBeneficiariesCommandHandler : ICommandHandler<UpdateMaxBen
         }
 
         // RN-05: El nuevo valor no puede ser menor a los beneficiarios asignados
-        var assignedCount = await _beneficiariesCounter.CountActiveBeneficiariesAsync(request.SubscriptionId, cancellationToken);
+        var assignedCount = await _beneficiaries.CountActiveAsync(request.SubscriptionId, cancellationToken);
         if (request.NewMax < assignedCount)
         {
             return Result<SubscriptionDto>.Conflict(

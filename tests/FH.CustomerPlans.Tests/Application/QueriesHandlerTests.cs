@@ -7,15 +7,13 @@ using FH.Customers.Application.UseCases.CustomerPlans.Queries.GetSubscriptionByI
 using FH.Customers.Application.UseCases.CustomerPlans.Queries.GetSubscriptionCapacity;
 using FH.Customers.Domain.Common.ValueObjects;
 using FH.Customers.Domain.Entities;
-using FH.Customers.Application.Contracts.Repositories;
-using FH.Customers.Application.Contracts.Gateways;
 
 namespace FH.CustomerPlans.Tests.Application;
 
 public class QueriesHandlerTests
 {
     private readonly Mock<ISubscriptionRepository> _repositoryMock = new();
-    private readonly Mock<IAssignedBeneficiariesCounter> _counterMock = new();
+    private readonly Mock<IBeneficiaryRepository> _beneficiariesMock = new();
 
     [Fact]
     public async Task GetCustomerSubscriptions_WhenCustomerHasSubscriptions_ShouldReturnList()
@@ -94,10 +92,10 @@ public class QueriesHandlerTests
         _repositoryMock.Setup(r => r.GetByIdAsync(subId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(sub);
 
-        _counterMock.Setup(c => c.CountActiveBeneficiariesAsync(subId, It.IsAny<CancellationToken>()))
+        _beneficiariesMock.Setup(c => c.CountActiveAsync(subId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(2); // 2 ocupados
 
-        var handler = new GetSubscriptionCapacityQueryHandler(_repositoryMock.Object, _counterMock.Object);
+        var handler = new GetSubscriptionCapacityQueryHandler(_repositoryMock.Object, _beneficiariesMock.Object);
 
         var result = await handler.Handle(new GetSubscriptionCapacityQuery(subId), CancellationToken.None);
 

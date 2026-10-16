@@ -149,6 +149,31 @@ El módulo `Beneficiaries` es responsable de la administración de la cobertura 
 
 ---
 
+### HU-BEN-07: Reincorporación de un Beneficiario Retirado
+* **Como** Titular del Plan,
+* **Quiero** volver a incluir en mi suscripción a un beneficiario que había retirado,
+* **Para** recuperar su cobertura sin registrarlo de nuevo y conservando su historial.
+
+#### Criterios de Aceptación:
+* **Escenario 1: Reincorporación exitosa**
+  - **Dado** un beneficiario con estado `Removed`, una suscripción activa y cupo disponible,
+  - **Cuando** se envía `PATCH /api/v1/subscriptions/{subscriptionId}/beneficiaries/{memberId}/reactivate`,
+  - **Entonces** el estado vuelve a `Active`, `removed_at` queda vacío, se recalcula la edad derivada, se emite `BeneficiaryAddedDomainEvent` (para la auditoría y Financials equivale a un alta) y se retorna HTTP 200 OK con el beneficiario.
+* **Escenario 2: Beneficiario activo**
+  - **Dado** un beneficiario con estado `Active`,
+  - **Cuando** se intenta reincorporar,
+  - **Entonces** se rechaza con HTTP 409 Conflict.
+* **Escenario 3: Cupo lleno o documento repetido**
+  - **Dado** que la suscripción ya alcanzó su cupo, u otro beneficiario activo tiene el mismo documento,
+  - **Cuando** se intenta reincorporar,
+  - **Entonces** se rechaza con HTTP 409 Conflict y no se guarda ningún cambio.
+* **Escenario 4: Suscripción no activa**
+  - **Dado** una suscripción suspendida, cancelada o vencida,
+  - **Cuando** se intenta reincorporar,
+  - **Entonces** se rechaza con HTTP 422 Unprocessable Entity.
+
+---
+
 ## 3. Explicación Técnica y Arquitectura
 
 ### 3.1 Estructura Interna del Módulo (DDD)
@@ -270,11 +295,11 @@ O para una mascota:
 ## 4. Estado de implementación (Entrega 1)
 
 **Implementado**
-- Alta, actualización, retiro y listado con filtro por estado, como Commands/Queries con el mediador propio y `Result<T>`.
+- Alta, actualización, retiro, reincorporación y listado con filtro por estado, como Commands/Queries con el mediador propio y `Result<T>`.
 - Persistencia con EF Core y PostgreSQL mediante `IBeneficiaryRepository` y `IUnitOfWork`: el `Member` y el `Beneficiary` se guardan en una sola transacción.
-- Reglas de dominio dentro de las entidades, lanzadas como `BusinessRuleException`: la mascota solo admite parentesco `Pet`, no se puede retirar dos veces, la fecha de nacimiento no puede ser futura, el nombre es obligatorio y solo se editan beneficiarios activos.
-- Suscripción existente y activa, y cupo máximo, validados en el handler de alta.
-- Duplicados por tipo y número de documento entre beneficiarios activos de la misma suscripción, tanto en el alta como en la actualización.
+- Reglas de dominio dentro de las entidades, lanzadas como `BusinessRuleException`: la mascota solo admite parentesco `Pet`, no se puede retirar dos veces, la fecha de nacimiento no puede ser futura, el nombre es obligatorio y solo se editan beneficiarios activos y solo se reincorporan los retirados.
+- Suscripción existente y activa, y cupo máximo, validados en los handlers de alta y de reincorporación.
+- Duplicados por tipo y número de documento entre beneficiarios activos de la misma suscripción, en el alta, la actualización y la reincorporación.
 - Eventos de dominio `BeneficiaryAddedDomainEvent`, `BeneficiaryRemovedDomainEvent` y `BeneficiaryUpdatedDomainEvent`, emitidos por `Beneficiary`.
 - Colección de endpoints con casos exitosos y de error en `docs/ENDPOINTS.md`.
 

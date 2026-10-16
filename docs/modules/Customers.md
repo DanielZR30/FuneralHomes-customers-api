@@ -20,7 +20,7 @@ La entidad `Customer` vive en `Domain/Entities`, su mapeo en `Persistence/Config
 | Regla | Descripción | Respuesta HTTP |
 |---|---|---|
 | RN-01 | El nombre del titular es obligatorio y no puede ser blanco | `400` |
-| RN-02 | Tipo y número de identificación son obligatorios | `400` |
+| RN-02 | Tipo y número de identificación son obligatorios; el tipo debe ser uno de `CC`, `CE`, `TI`, `RC`, `PA`, `NIT` (enum `IdentificationType`) | `400` |
 | RN-03 | La pareja `(tipo, número)` es única en todo el sistema | `409` |
 | RN-04 | En la actualización el nombre no puede quedar blanco | `400` |
 | RN-05 | La identificación es **inmutable** tras la creación | — (no se expone en el payload de actualización) |
@@ -28,7 +28,7 @@ La entidad `Customer` vive en `Domain/Entities`, su mapeo en `Persistence/Config
 | RN-07 | `Inactive` es terminal: no admite reapertura ni suspensión | `409` |
 | RN-08 | La consulta por identificación exige ambos parámetros | `400` |
 
-Normalización aplicada en el límite de datos (`CustomerRepository`): el tipo de documento se recorta y se pasa a mayúsculas, el número se recorta, y el correo electrónico se almacena en minúsculas.
+Normalización: el tipo de documento es el enum `IdentificationType` (se acepta en mayúsculas o minúsculas, por ejemplo `cc`, y se guarda como texto `CC`); `DocumentId` y el repositorio recortan y pasan a mayúsculas el número, y el correo electrónico se almacena en minúsculas.
 
 ---
 

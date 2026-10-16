@@ -32,7 +32,9 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         // Value objects: se guardan en la misma tabla `customers`.
         builder.OwnsOne(c => c.Document, d =>
         {
+            // Enum guardado como texto ("CC", "NIT"...): la columna y sus valores no cambian.
             d.Property(x => x.Type)
+                .HasConversion<string>()
                 .HasColumnName("identification_type")
                 .HasMaxLength(20)
                 .IsRequired();

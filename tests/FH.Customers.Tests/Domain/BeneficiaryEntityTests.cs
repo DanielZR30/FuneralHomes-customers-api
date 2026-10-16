@@ -84,25 +84,50 @@ public class BeneficiaryEntityTests
     }
 
     [Fact]
-    public void Reactivate_ShouldRestoreActiveStatus()
+    public void Reactivate_WhenRemoved_ShouldRestoreActiveStatusAndRaiseAddedEvent()
     {
         var beneficiary = Beneficiary.Enroll(
             SubscriptionId, NewHuman(), BeneficiaryType.Associated, RelationshipType.Child);
         beneficiary.Remove();
+        beneficiary.ClearDomainEvents();
 
         beneficiary.Reactivate();
 
         Assert.Equal(BeneficiaryStatus.Active, beneficiary.Status);
         Assert.Null(beneficiary.RemovedAt);
+        var evt = Assert.IsType<BeneficiaryAddedDomainEvent>(Assert.Single(beneficiary.DomainEvents));
+        Assert.Equal(beneficiary.MemberId, evt.MemberId);
+    }
+
+    [Fact]
+    public void Enroll_ShouldKeepTheMemberInsideTheAggregate()
+    {
+        var member = NewHuman();
+
+        var beneficiary = Beneficiary.Enroll(
+            SubscriptionId, member, BeneficiaryType.Associated, RelationshipType.Child);
+        beneficiary.UpdateMemberDetails("Luis Alberto", new DateOnly(1990, 1, 1), null, null, null, null, null);
+
+        Assert.Same(member, beneficiary.Member);
+        Assert.Equal("Luis Alberto", member.FirstName);
+    }
+
+    [Fact]
+    public void Reactivate_WhenActive_ShouldThrow()
+    {
+        var beneficiary = Beneficiary.Enroll(
+            SubscriptionId, NewHuman(), BeneficiaryType.Associated, RelationshipType.Child);
+
+        Assert.Throws<BusinessRuleException>(() => beneficiary.Reactivate());
     }
 
     [Fact]
     public void UpdateMemberDetails_WhenMemberNotLoaded_ShouldThrowInvalidOperation()
     {
-        var beneficiary = Beneficiary.Enroll(
-            SubscriptionId, NewHuman(), BeneficiaryType.Associated, RelationshipType.Child);
+        // Create (interno) solo guarda el id del miembro, como pasa al consultar sin Include.
+        var beneficiary = Beneficiary.Create(
+            SubscriptionId, Guid.NewGuid(), BeneficiaryType.Associated, RelationshipType.Child);
 
-        // Enroll no carga la navegación Member (solo el id), como pasa al consultar sin Include.
         Assert.Throws<InvalidOperationException>(() => beneficiary.UpdateMemberDetails(
             "Nuevo", new DateOnly(1991, 1, 1), null, null, null, null, null));
     }

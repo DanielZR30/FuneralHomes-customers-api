@@ -16,8 +16,30 @@ public class ValueObjectsTests
     {
         var doc = new DocumentId(" cc ", " ab123 ");
 
-        Assert.Equal("CC", doc.Type);
+        Assert.Equal(IdentificationType.CC, doc.Type);
         Assert.Equal("AB123", doc.Number);
+    }
+
+    [Theory]
+    [InlineData("XYZ")]
+    [InlineData("CEDULA")]
+    [InlineData("1")]
+    public void DocumentId_WithTypeOutsideTheList_ShouldThrowBusinessRule(string type)
+    {
+        // C4: el tipo de documento es una lista cerrada (CC, CE, TI, RC, PA, NIT).
+        Assert.Throws<BusinessRuleException>(() => new DocumentId(type, "123"));
+    }
+
+    [Theory]
+    [InlineData("cc", true)]
+    [InlineData(" Nit ", true)]
+    [InlineData("pa", true)]
+    [InlineData("C.C.", false)]
+    [InlineData("0", false)]
+    [InlineData("", false)]
+    public void DocumentId_IsValidType_ShouldAcceptOnlyTheAllowedTypes(string type, bool expected)
+    {
+        Assert.Equal(expected, DocumentId.IsValidType(type));
     }
 
     [Fact]

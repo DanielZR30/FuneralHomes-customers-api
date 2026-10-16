@@ -56,3 +56,14 @@ public enum AuditAction
     BeneficiaryRemoved,
     BeneficiaryUpdated
 }
+
+/// <summary>Tipos de documento de identidad permitidos (Colombia).</summary>
+public enum IdentificationType
+{
+    CC,   // Cédula de ciudadanía
+    CE,   // Cédula de extranjería
+    TI,   // Tarjeta de identidad
+    RC,   // Registro civil
+    PA,   // Pasaporte
+    NIT   // Número de identificación tributaria (empresas)
+}

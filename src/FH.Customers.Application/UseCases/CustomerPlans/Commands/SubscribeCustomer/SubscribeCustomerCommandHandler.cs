@@ -1,10 +1,10 @@
 using FH.Customers.Application.Contracts.Repositories;
-using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Domain.Common.ValueObjects;
 using FH.Customers.Domain.Entities;
 using FH.Customers.Domain.Exceptions;
 using FH.Customers.Application.Contracts.Persistence;
 using FH.Customers.Application.Contracts.Gateways;
+using FH.Customers.Domain.Common.Enums;
 using FH.Customers.Application.Utilities.Results;
 using FH.Customers.Application.UseCases.CustomerPlans.Common;
 using FH.Customers.Application.UseCases.Common;
@@ -14,18 +14,18 @@ namespace FH.Customers.Application.UseCases.CustomerPlans.Commands.SubscribeCust
 public class SubscribeCustomerCommandHandler : ICommandHandler<SubscribeCustomerCommand, SubscriptionDto>
 {
     private readonly ISubscriptionRepository _subscriptionRepository;
-    private readonly ICustomerExistenceChecker _customerExistenceChecker;
+    private readonly ICustomerRepository _customers;
     private readonly IFinancialsPlanGateway _financialsPlanGateway;
     private readonly IUnitOfWork _unitOfWork;
 
     public SubscribeCustomerCommandHandler(
         ISubscriptionRepository subscriptionRepository,
-        ICustomerExistenceChecker customerExistenceChecker,
+        ICustomerRepository customers,
         IFinancialsPlanGateway financialsPlanGateway,
         IUnitOfWork unitOfWork)
     {
         _subscriptionRepository = subscriptionRepository;
-        _customerExistenceChecker = customerExistenceChecker;
+        _customers = customers;
         _financialsPlanGateway = financialsPlanGateway;
         _unitOfWork = unitOfWork;
     }
@@ -35,8 +35,8 @@ public class SubscribeCustomerCommandHandler : ICommandHandler<SubscribeCustomer
         CancellationToken cancellationToken)
     {
         // RN-06: El cliente debe existir y estar activo
-        var customerExists = await _customerExistenceChecker.ExistsActiveAsync(request.CustomerId, cancellationToken);
-        if (!customerExists)
+        var customer = await _customers.GetByIdAsync(request.CustomerId, cancellationToken);
+        if (customer is null || customer.Status != CustomerStatus.Active)
         {
             return Result<SubscriptionDto>.NotFound("El cliente especificado no existe o no se encuentra activo.");
         }

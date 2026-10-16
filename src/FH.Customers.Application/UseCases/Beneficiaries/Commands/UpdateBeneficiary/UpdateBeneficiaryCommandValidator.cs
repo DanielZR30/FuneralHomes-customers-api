@@ -1,4 +1,5 @@
 using FluentValidation;
+using FH.Customers.Domain.Common.ValueObjects;
 
 namespace FH.Customers.Application.UseCases.Beneficiaries.Commands.UpdateBeneficiary;
 
@@ -28,6 +29,11 @@ public class UpdateBeneficiaryCommandValidator : AbstractValidator<UpdateBenefic
         RuleFor(x => x.IdentificationType)
             .NotEmpty().WithMessage("Si indica el número de documento, debe indicar también el tipo.")
             .When(x => !string.IsNullOrWhiteSpace(x.IdentificationNumber));
+
+        RuleFor(x => x.IdentificationType)
+            .Must(DocumentId.IsValidType)
+            .WithMessage($"El tipo de identificación no es válido. Valores permitidos: {DocumentId.AllowedTypes}.")
+            .When(x => !string.IsNullOrWhiteSpace(x.IdentificationType));
 
         RuleFor(x => x.Email)
             .EmailAddress().WithMessage("El correo electrónico no tiene un formato válido.")

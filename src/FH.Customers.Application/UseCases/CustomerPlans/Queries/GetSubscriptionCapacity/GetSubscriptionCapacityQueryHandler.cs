@@ -1,7 +1,5 @@
 using FH.Customers.Application.Contracts.Repositories;
-using FH.Customers.Application.Contracts.Repositories;
 using FH.Customers.Domain.Common.Enums;
-using FH.Customers.Application.Contracts.Gateways;
 using FH.Customers.Application.Utilities.Results;
 using FH.Customers.Application.UseCases.CustomerPlans.Common;
 using FH.Customers.Application.UseCases.Common;
@@ -11,14 +9,14 @@ namespace FH.Customers.Application.UseCases.CustomerPlans.Queries.GetSubscriptio
 public class GetSubscriptionCapacityQueryHandler : IQueryHandler<GetSubscriptionCapacityQuery, SubscriptionCapacityDto>
 {
     private readonly ISubscriptionRepository _subscriptionRepository;
-    private readonly IAssignedBeneficiariesCounter _beneficiariesCounter;
+    private readonly IBeneficiaryRepository _beneficiaries;
 
     public GetSubscriptionCapacityQueryHandler(
         ISubscriptionRepository subscriptionRepository,
-        IAssignedBeneficiariesCounter beneficiariesCounter)
+        IBeneficiaryRepository beneficiaries)
     {
         _subscriptionRepository = subscriptionRepository;
-        _beneficiariesCounter = beneficiariesCounter;
+        _beneficiaries = beneficiaries;
     }
 
     public async Task<Result<SubscriptionCapacityDto>> Handle(
@@ -31,7 +29,7 @@ public class GetSubscriptionCapacityQueryHandler : IQueryHandler<GetSubscription
             return Result<SubscriptionCapacityDto>.NotFound($"Suscripción con ID {request.SubscriptionId} no encontrada.");
         }
 
-        var assigned = await _beneficiariesCounter.CountActiveBeneficiariesAsync(request.SubscriptionId, cancellationToken);
+        var assigned = await _beneficiaries.CountActiveAsync(request.SubscriptionId, cancellationToken);
         var max = subscription.MaxBeneficiaries.Value;
         var available = Math.Max(0, max - assigned);
         var canAccept = subscription.Status == SubscriptionStatus.Active && available > 0;

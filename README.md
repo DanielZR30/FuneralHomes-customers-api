@@ -74,7 +74,7 @@ FH.Customers.Persistence/
 └── DependencyInjection.cs          # Registro de la capa (AddPersistence)
 
 FH.Customers.Infrastructure/
-├── CustomerPlans/Gateways/         # Adaptadores hacia Financials y verificación de clientes
+├── CustomerPlans/Gateways/         # Adaptador hacia Financials
 ├── Messaging/                      # InMemoryEventPublisher
 └── DependencyInjection.cs          # Registro de la capa (AddInfrastructure)
 
